@@ -9,9 +9,12 @@ defmodule Authable.Authentications.Basic do
   @resource_owner Application.get_env(:authable, :resource_owner)
 
   def authenticate(auth_credentials) do
-    {:ok, credentials} = Base.decode64(auth_credentials)
-    [email, password] = String.split(credentials, ":")
-    authenticate(email, password)
+    case Base.decode64(auth_credentials) do
+      {:ok, credentials} ->
+        [email, password] = String.split(credentials, ":")
+        authenticate(email, password)
+      :error -> nil
+    end
   end
 
   defp authenticate(email, password) do
