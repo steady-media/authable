@@ -11,16 +11,15 @@ defmodule Authable.Factory do
 
   use ExMachina.Ecto, repo: @repo
 
-  def factory(:user) do
+  def user_factory do
     %@resource_owner{
       email: sequence(:email, &"email-#{&1}@example.com"),
       password: Comeonin.Bcrypt.hashpwsalt("12345678")
     }
   end
 
-  def factory(:client) do
+  def client_factory do
     %@client{
-      user: build(:user),
       name: sequence(:name, &"client#{&1}"),
       secret: SecureRandom.urlsafe_base64,
       redirect_uri: "https://example.com/oauth2-redirect-path",
@@ -31,61 +30,52 @@ defmodule Authable.Factory do
     }
   end
 
-  def factory(:session_token) do
+  def session_token_factory do
     %@token_store{
-      user: build(:user),
       name: "session_token",
       value: "st1234567890",
       expires_at: Timex.Time.now(:seconds) + 3600
     }
   end
 
-  def factory(:access_token) do
+  def access_token_factory do
     %@token_store{
-      user: build(:user),
       name: "access_token",
       value: "at1234567890",
       expires_at: Timex.Time.now(:seconds) + 3600,
       details: %{
         scope: "read",
         grant_type: "authorization_code",
-        client_id: build(:client).id
       }
     }
   end
 
-  def factory(:refresh_token) do
+  def refresh_token_factory do
     %@token_store{
-      user_id: build(:user),
       name: "refresh_token",
       value: "rt1234567890",
       expires_at: Timex.Time.now(:seconds) + 3600,
       details: %{
         grant_type: "authorization_code",
-        client_id: build(:client).id,
         scope: "read"
       }
     }
   end
 
-  def factory(:authorization_code) do
+  def authorization_code_factory do
     %@token_store{
-      user_id: build(:user),
       name: "authorization_code",
       value: "a0123456789c",
       expires_at: Timex.Time.now(:seconds) + 900,
       details: %{
         scope: "read",
         grant_type: "password",
-        client_id: build(:client).id
       }
     }
   end
 
-  def factory(:app) do
+  def app_factory do
     %@app{
-      user_id: build(:user),
-      client_id: build(:client),
       scope: "read,write"
     }
   end

@@ -3,7 +3,7 @@ defmodule Authable.Models.ClientTest do
   import Authable.Factory
 
   setup do
-    client_owner = create(:user)
+    client_owner = insert(:user)
     {:ok, [user_id: client_owner.id]}
   end
 

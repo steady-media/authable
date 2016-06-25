@@ -6,9 +6,9 @@ defmodule Authable.GrantTypes.PasswordTest do
   alias Authable.GrantTypes.Password, as: PasswordGrantType
 
   setup do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id)
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id)
     params = %{"email" => resource_owner.email, "password" => "12345678", "client_id" => client.id, "scope" => "read"}
     {:ok, [params: params]}
   end

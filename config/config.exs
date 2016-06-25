@@ -9,6 +9,7 @@ use Mix.Config
 # 3rd-party users, it should be done in your "mix.exs" file.
 
 config :authable,
+  ecto_repos: [Authable.Repo],
   repo: Authable.Repo,
   resource_owner: Authable.Models.User,
   token_store: Authable.Models.Token,

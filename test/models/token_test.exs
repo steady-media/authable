@@ -3,7 +3,7 @@ defmodule Authable.Models.TokenTest do
   import Authable.Factory
 
   setup do
-    resource_owner = create(:user)
+    resource_owner = insert(:user)
     {:ok, [user: resource_owner]}
   end
 
@@ -47,12 +47,12 @@ defmodule Authable.Models.TokenTest do
   end
 
   test "is_expired true", %{user: user} do
-    token = create(:refresh_token, user_id: user.id, expires_at: (Timex.Time.now(:seconds) - 1))
+    token = insert(:refresh_token, user_id: user.id, expires_at: (Timex.Time.now(:seconds) - 1))
     assert @token_store.is_expired?(token)
   end
 
   test "is_expired false", %{user: user} do
-    token = create(:access_token, user_id: user.id)
+    token = insert(:access_token, user_id: user.id)
     assert @token_store.is_expired?(token) == false
   end
 end

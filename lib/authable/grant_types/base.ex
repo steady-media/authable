@@ -25,19 +25,24 @@ defmodule Authable.GrantTypes.Base do
       }
     }
 
-    if @strategies[:refresh_token] do
-      # create refresh_token
-      refresh_token_changeset = @token_store.refresh_token_changeset(
-        %@token_store{}, token_params
-      )
-      case @repo.insert(refresh_token_changeset) do
-        {:ok, refresh_token} ->
-          token_params = token_params |> Map.merge(%{details:
-            Map.put(token_params[:details],
-              :refresh_token, refresh_token.value)}
-          )
+    token_params =
+      if @strategies[:refresh_token] do
+        # create refresh_token
+        refresh_token_changeset = @token_store.refresh_token_changeset(
+          %@token_store{}, token_params
+        )
+        case @repo.insert(refresh_token_changeset) do
+          {:ok, refresh_token} ->
+            token_params |> Map.merge(%{details:
+              Map.put(token_params[:details],
+                :refresh_token, refresh_token.value)}
+            )
+          :error ->
+            token_params
+        end
+      else
+        token_params
       end
-    end
 
     access_token_changeset = @token_store.access_token_changeset(
       %@token_store{}, token_params

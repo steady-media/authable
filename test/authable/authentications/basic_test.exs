@@ -6,7 +6,7 @@ defmodule Authable.Authentications.BasicTest do
   alias Authable.Authentications.Basic, as: BasicAuthentication
 
   setup do
-    user = create(:user)
+    user = insert(:user)
     basic_auth_token = Base.encode64("#{user.email}:12345678")
     {:ok, [basic_auth_token: basic_auth_token]}
   end

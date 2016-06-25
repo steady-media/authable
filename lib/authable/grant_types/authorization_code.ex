@@ -19,19 +19,17 @@ defmodule Authable.GrantTypes.AuthorizationCode do
   end
 
   defp authorize(code, redirect_uri, client_id) do
-    access_token = nil
     token = @repo.get_by(@token_store, value: code)
     if token && !@token_store.is_expired?(token) &&
        token.details["redirect_uri"] == redirect_uri &&
        token.details["client_id"] == client_id do
       user = @repo.get(@resource_owner, token.user_id)
       if user && app_authorized?(user.id, client_id) do
-        access_token = create_oauth2_tokens(user, grant_type, client_id,
-          token.details["scope"], redirect_uri)
         @repo.delete!(token)
+        create_oauth2_tokens(user, grant_type, client_id,
+          token.details["scope"], redirect_uri)
       end
     end
-    access_token
   end
 
   defp grant_type, do: "authorization_code"

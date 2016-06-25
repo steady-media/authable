@@ -8,7 +8,8 @@ defmodule Authable.Authentications.BearerTest do
   @access_token_value "access_token_1234"
 
   setup do
-    create(:access_token, %{value: @access_token_value})
+    user = insert(:user)
+    insert(:access_token, %{value: @access_token_value, user: user})
     :ok
   end
 

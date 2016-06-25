@@ -3,9 +3,9 @@ defmodule Authable.Models.AppTest do
   import Authable.Factory
 
   setup do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id)
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id)
     {:ok, [user_id: resource_owner.id, client_id: client.id]}
   end
 

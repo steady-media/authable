@@ -6,8 +6,8 @@ defmodule Authable.GrantTypes.ClientCredentialsTest do
   alias Authable.GrantTypes.ClientCredentials, as: ClientCredentialsGrantType
 
   setup do
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id)
     params = %{"client_id" => client.id, "client_secret" => client.secret}
     {:ok, [params: params]}
   end

@@ -8,6 +8,14 @@ The package can be installed as:
 
   1. Add authable to your list of dependencies in `mix.exs`:
 
+  If you need install for ecto versions > 2.0, then use
+
+        def deps do
+          [{:authable, "~> 0.5.0"}]
+        end
+
+  If you need install for ecto versions > 1.0 and < 2.0, then use
+
         def deps do
           [{:authable, "~> 0.4.0"}]
         end
@@ -21,6 +29,7 @@ The package can be installed as:
   3. Add authable configurations to your `config/config.exs` file:
 
         config :authable,
+          ecto_repos: [Authable.Repo],
           repo: Authable.Repo,
           resource_owner: Authable.Models.User,
           token_store: Authable.Models.Token,
@@ -33,10 +42,10 @@ The package can be installed as:
             session_token: 30 * 24 * 3600
           },
           strategies: %{
-            authorization_code: Authable.GrantTypes.AuthorizationCode,
-            client_credentials: Authable.GrantTypes.ClientCredentialsGrantType,
-            password: Authable.GrantTypes.Password,
-            refresh_token: Authable.GrantTypes.RefreshToken
+            authorization_code: Authable.AuthorizationCodeGrantType,
+            client_credentials: Authable.ClientCredentialsGrantType,
+            password: Authable.PasswordGrantType,
+            refresh_token: Authable.RefreshTokenGrantType
           },
           scopes: ~w(read write session)
 

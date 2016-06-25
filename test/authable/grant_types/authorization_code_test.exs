@@ -8,11 +8,11 @@ defmodule Authable.GrantTypes.AuthorizationCodeTest do
   @scopes "read"
 
   setup do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id)
-    create(:app, scope: @scopes, user_id: resource_owner.id, client_id: client.id)
-    token = create(:authorization_code, user_id: resource_owner.id, details: %{client_id: client.id, redirect_uri: client.redirect_uri, scope: @scopes})
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id)
+    insert(:app, scope: @scopes, user_id: resource_owner.id, client_id: client.id)
+    token = insert(:authorization_code, user_id: resource_owner.id, details: %{client_id: client.id, redirect_uri: client.redirect_uri, scope: @scopes})
     params = %{"client_id" => client.id, "client_secret" => client.secret, "code" => token.value, "redirect_uri" => client.redirect_uri}
     {:ok, [params: params, user_id: resource_owner.id]}
   end
@@ -23,12 +23,12 @@ defmodule Authable.GrantTypes.AuthorizationCodeTest do
     assert access_token.details[:grant_type] == "authorization_code"
   end
 
-  test "oauth2 authorization with authorization_code auto creates app", %{params: params} do
+  test "oauth2 authorization with authorization_code auto inserts app", %{params: params} do
     AuthorizationCodeGrantType.authorize(params)
     assert Enum.count(@repo.all(@app)) > 0
   end
 
-  test "can not create access_token more than one with a token with same authorization_code params", %{params: params} do
+  test "can not insert access_token more than one with a token with same authorization_code params", %{params: params} do
     AuthorizationCodeGrantType.authorize(params)
     second_token = AuthorizationCodeGrantType.authorize(params)
     assert is_nil(second_token)

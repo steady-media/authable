@@ -16,9 +16,9 @@ defmodule Authable.OAuth2Test do
   end
 
   test "resource_owner authorize app for a client" do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id,
                     redirect_uri: @redirect_uri)
     params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri,
                "scope" => @scopes}
@@ -28,11 +28,11 @@ defmodule Authable.OAuth2Test do
 
   test "resource_owner re-authorize app with new scopes for a client" do
     new_scopes = "read,write"
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id,
                     redirect_uri: @redirect_uri)
-    app = create(:app, user_id: resource_owner.id, client_id: client.id,
+    app = insert(:app, user_id: resource_owner.id, client_id: client.id,
                  scope: @scopes)
 
     params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri,
@@ -43,11 +43,11 @@ defmodule Authable.OAuth2Test do
   end
 
   test "resource_owner re-authorize app with old scopes for a client" do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id,
                     redirect_uri: @redirect_uri)
-    app = create(:app, user_id: resource_owner.id, client_id: client.id,
+    app = insert(:app, user_id: resource_owner.id, client_id: client.id,
                  scope: @scopes)
 
     params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri,
@@ -58,9 +58,9 @@ defmodule Authable.OAuth2Test do
   end
 
   test "does not allow to change redirect_uri when authorize app" do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id,
                     redirect_uri: @redirect_uri)
     params = %{"client_id" => client.id, "redirect_uri" => "https://xyz.com/nx",
                "scope" => @scopes}
@@ -68,16 +68,16 @@ defmodule Authable.OAuth2Test do
   end
 
   test "deletes app and user's all client tokens" do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id,
                     redirect_uri: @redirect_uri)
-    app = create(:app, user_id: resource_owner.id, client_id: client.id,
+    app = insert(:app, user_id: resource_owner.id, client_id: client.id,
                  scope: @scopes)
-    create(:access_token, user_id: resource_owner.id, details: %{
+    insert(:access_token, user_id: resource_owner.id, details: %{
       client_id: client.id
     })
-    create(:refresh_token, user_id: resource_owner.id, details: %{
+    insert(:refresh_token, user_id: resource_owner.id, details: %{
       client_id: client.id
     })
     OAuth2.revoke_app_authorization(resource_owner, %{"id" => app.id})
