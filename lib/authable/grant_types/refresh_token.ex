@@ -11,12 +11,25 @@ defmodule Authable.GrantTypes.RefreshToken do
   @client Application.get_env(:authable, :client)
   @app Application.get_env(:authable, :app)
 
-  def authorize(params) do
-    authorize(params["client_id"], params["client_secret"],
-      params["refresh_token"])
-  end
+  @doc """
+  Authorize client for 'resouce owner' using client credentials and
+  refresh token.
 
-  defp authorize(client_id, client_secret, refresh_token) do
+  For authorization, authorize function requires a map contains 'client_id' and
+  'client_secret' and 'refresh_token'. With valid credentials;
+  it automatically creates access_token and
+  refresh_token(if enabled via config) then it returns
+  access_token struct, otherwise nil.
+
+  ## Examples
+
+      Authable.GrantTypes.RefreshToken.authorize(%{
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+        "refresh_token" => "XJaVz3lCFC9IfifBriA-dw"
+      %})
+  """
+  def authorize(%{"client_id" => client_id, "client_secret" => client_secret, "refresh_token" => refresh_token}) do
     token = @repo.get_by(@token_store, value: refresh_token)
     if token && !@token_store.is_expired?(token) &&
        token.details["client_id"] == client_id do

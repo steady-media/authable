@@ -3,7 +3,7 @@ defmodule Authable.Mixfile do
 
   def project do
     [app: :authable,
-     version: "0.5.0",
+     version: "0.5.1",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
@@ -11,7 +11,8 @@ defmodule Authable.Mixfile do
      aliases: aliases,
      description: description,
      package: package,
-     deps: deps]
+     deps: deps,
+     docs: [extras: ["README.md"]]]
   end
 
   # Configuration for the OTP application

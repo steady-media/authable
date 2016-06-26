@@ -12,25 +12,84 @@ defmodule Authable.OAuth2 do
   @strategies Application.get_env(:authable, :strategies)
   @scopes Application.get_env(:authable, :scopes)
 
+  @doc """
+  Calls appropriate module authorize function for given grant type.
+
+  It simply authorizes based on allowed strategies in configuration and then
+  returns access token as @token_store(Authable.Models.Token) model.
+
+  ## Examples
+
+      # For authorization_code grant type
+      Authable.OAuth2.authorize(%{
+        "grant_type" => "authorization_code",
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+        "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
+        "code" => "W_hb8JEDmeYChsNfOGCmbQ"
+      %})
+
+      # For client_credentials grant type
+      Authable.OAuth2.authorize(%{
+        "grant_type" => "client_credentials",
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q"
+      %})
+
+      # For password grant type
+      Authable.OAuth2.authorize(%{
+        "grant_type" => "password",
+        "email" => "foo@example.com",
+        "password" => "12345678",
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "scope" => "read"
+      %})
+
+      # For refresh_token grant type
+      Authable.OAuth2.authorize(%{
+        "grant_type" => "refresh_token",
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+        "refresh_token" => "XJaVz3lCFC9IfifBriA-dw"
+      %})
+
+      # For any other grant type; must implement authorize function and returns
+      # access_token as @token_store(Authable.Models.Token) model.
+  """
   def authorize(params) do
     strategy_check(params["grant_type"])
     @strategies[String.to_atom(params["grant_type"])].authorize(params)
   end
 
-  def authorize_app(user, params) do
-    client = @repo.get_by(@client, id: params["client_id"],
-                  redirect_uri: params["redirect_uri"])
+  @doc """
+  Authorizes client for resouce owner with given scopes
+
+  It authorizes app to access resouce owner's resouces. Simply, user
+  authorizes a client to grant resouces with scopes. If client already
+  authorized for resouce owner then it checks scopes and updates when necessary.
+
+  ## Examples
+
+      # For authorization_code grant type
+      Authable.OAuth2.authorize_app(user, %{
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
+        "scope" => "read,write"
+      %})
+  """
+  def authorize_app(user, %{"client_id" => client_id, "redirect_uri" => redirect_uri, "scope" => scope}) do
+    client = @repo.get_by(@client, id: client_id, redirect_uri: redirect_uri)
     if client do
-      app = @repo.get_by(@app, user_id: user.id, client_id: params["client_id"])
+      app = @repo.get_by(@app, user_id: user.id, client_id: client_id)
       if is_nil(app) do
         @repo.insert!(@app.changeset(%@app{}, %{
           user_id: user.id,
-          client_id: params["client_id"],
-          scope: params["scope"]
+          client_id: client_id,
+          scope: scope
         }))
       else
-        if app.scope != params["scope"] do
-          scope = params["scope"]
+        if app.scope != scope do
+          scope = scope
           |> String.split(",")
           |> Enum.concat(String.split(app.scope, ","))
           |> Enum.uniq()
@@ -43,8 +102,20 @@ defmodule Authable.OAuth2 do
     end
   end
 
-  def revoke_app_authorization(user, params) do
-    app = @repo.get_by!(@app, id: params["id"], user_id: user.id)
+  @doc """
+  Revokes access to resouce owner's resources.
+
+  Delete all tokens and then removes app for given app identifier.
+
+  ## Examples
+
+      # For authorization_code grant type
+      Authable.OAuth2.authorize_app(user, %{
+        "id" => "12024ca6-192b-469d-bfb6-9b45023ad13e"
+      %})
+  """
+  def revoke_app_authorization(user, %{"id" => id}) do
+    app = @repo.get_by!(@app, id: id, user_id: user.id)
     @repo.delete!(app)
 
     tokens = @token_store

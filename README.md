@@ -71,6 +71,8 @@ The package can be installed as:
 
 ## Usage
 
+Please refer to hex docs for each module, function details and samples https://hexdocs.pm/authable.
+
 ### Generic Token Storage
 
 To handle all possible token types, a generic token storage scheme is used for `Authable.Models.Token`. So, it can be used for all OAuth2 tokens and any other token scheme like confirmation token, password recovery tokens, mail list tokens, session tokens and etc...
@@ -121,7 +123,6 @@ Authable is an extensible module, you can create your strategy and share as hex 
 
 ## Todo
 
-- Documentation
 - HMAC Auth will be added as a new external strategy
 
 ## References

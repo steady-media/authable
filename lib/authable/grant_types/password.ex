@@ -10,12 +10,27 @@ defmodule Authable.GrantTypes.Password do
   @resource_owner Application.get_env(:authable, :resource_owner)
   @client Application.get_env(:authable, :client)
 
-  def authorize(params) do
-    authorize(params["email"], params["password"], params["client_id"],
-      params["scope"])
-  end
 
-  defp authorize(email, password, client_id, scope) do
+  @doc """
+  Authorize client for 'resouce owner' using resouce owner credentials and
+  client identifier.
+
+  For authorization, authorize function requires a map contains 'email' and
+  'password', 'scope' and 'client_id'. With valid credentials;
+  it automatically creates access_token and
+  refresh_token(if enabled via config) then it returns
+  access_token struct, otherwise nil.
+
+  ## Examples
+
+      Authable.GrantTypes.Password.authorize(%{
+        "email" => "foo@example.com",
+        "password" => "12345678",
+        "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+        "scope" => "read"
+      %})
+  """
+  def authorize(%{"email" => email, "password" => password, "client_id" => client_id, "scope" => scope}) do
     client = @repo.get(@client, client_id)
     user = @repo.get_by(@resource_owner, email: email)
     if client && user && match_with_user_password(password, user) do
