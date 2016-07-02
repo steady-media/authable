@@ -1,9 +1,9 @@
-defmodule Authable.GrantTypes.BaseTest do
+defmodule Authable.GrantType.BaseTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.GrantTypes.Base, as: BaseGrantType
+  alias Authable.GrantType.Base, as: BaseGrantType
 
   @scopes "read"
 
@@ -15,11 +15,6 @@ defmodule Authable.GrantTypes.BaseTest do
     token = insert(:authorization_code, user_id: resource_owner.id, details: %{client_id: client.id, redirect_uri: client.redirect_uri, scope: @scopes})
     params = %{"client_id" => client.id, "user_id" => resource_owner.id}
     {:ok, [params: params]}
-  end
-
-  test "authorize implementation" do
-    assert_raise Authable.NotImplementedError,
-      fn -> BaseGrantType.authorize(%{}) end
   end
 
   test "app_authorized? with authorized app for client", %{params: params} do

@@ -1,4 +1,4 @@
-defmodule Authable.Models.Client do
+defmodule Authable.Model.Client do
   @moduledoc """
   Oauth2 client
   """

@@ -11,7 +11,7 @@ defmodule Authable do
     import Supervisor.Spec
 
     children = [
-      worker(@repo, [])
+      supervisor(@repo, [])
     ]
 
     opts = [strategy: :one_for_one, name: Authable.Supervisor]

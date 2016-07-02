@@ -1,9 +1,9 @@
-defmodule Authable.Authentications.SessionTest do
+defmodule Authable.Authentication.SessionTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.Authentications.Session, as: SessionAuthentication
+  alias Authable.Authentication.Session, as: SessionAuthentication
 
   @session_token_value "session_token_1234"
 
@@ -13,8 +13,9 @@ defmodule Authable.Authentications.SessionTest do
     :ok
   end
 
-  test "authorize with bearer authentication hash" do
-    authorized_user = SessionAuthentication.authenticate(@session_token_value)
+  test "authorize with session auth token" do
+    {:ok, authorized_user} = SessionAuthentication.authenticate(
+      @session_token_value, [])
     refute is_nil(authorized_user)
   end
 end

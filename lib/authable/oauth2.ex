@@ -16,7 +16,7 @@ defmodule Authable.OAuth2 do
   Calls appropriate module authorize function for given grant type.
 
   It simply authorizes based on allowed strategies in configuration and then
-  returns access token as @token_store(Authable.Models.Token) model.
+  returns access token as @token_store(Authable.Model.Token) model.
 
   ## Examples
 
@@ -54,7 +54,7 @@ defmodule Authable.OAuth2 do
       %})
 
       # For any other grant type; must implement authorize function and returns
-      # access_token as @token_store(Authable.Models.Token) model.
+      # access_token as @token_store(Authable.Model.Token) model.
   """
   def authorize(params) do
     strategy_check(params["grant_type"])
@@ -79,26 +79,32 @@ defmodule Authable.OAuth2 do
   """
   def authorize_app(user, %{"client_id" => client_id, "redirect_uri" => redirect_uri, "scope" => scope}) do
     client = @repo.get_by(@client, id: client_id, redirect_uri: redirect_uri)
-    if client do
-      app = @repo.get_by(@app, user_id: user.id, client_id: client_id)
-      if is_nil(app) do
-        @repo.insert!(@app.changeset(%@app{}, %{
-          user_id: user.id,
-          client_id: client_id,
-          scope: scope
-        }))
-      else
-        if app.scope != scope do
-          scope = scope
-          |> String.split(",")
-          |> Enum.concat(String.split(app.scope, ","))
-          |> Enum.uniq()
-          scope = @scopes -- (@scopes -- scope)
-          @repo.update!(@app.changeset(app, %{scope: Enum.join(scope, ",")}))
-        else
-          app
-        end
-      end
+    authorize_app(user, client, scope)
+  end
+
+  defp authorize_app(_, nil, _), do: {:error,
+   %{invalid_client: "Client not found"}, :unauthorized}
+  defp authorize_app(user, client, scope) do
+    app = @repo.get_by(@app, user_id: user.id, client_id: client.id)
+    authorize_app(user, client, app, scope)
+  end
+  defp authorize_app(user, client, nil, scope) do
+    @repo.insert!(@app.changeset(%@app{}, %{
+      user_id: user.id,
+      client_id: client.id,
+      scope: scope
+    }))
+  end
+  defp authorize_app(_, _, app, scope) do
+    if app.scope != scope do
+      scope = scope
+      |> String.split(",")
+      |> Enum.concat(String.split(app.scope, ","))
+      |> Enum.uniq()
+      scope = @scopes -- (@scopes -- scope)
+      @repo.update!(@app.changeset(app, %{scope: Enum.join(scope, ",")}))
+    else
+      app
     end
   end
 
@@ -133,7 +139,7 @@ defmodule Authable.OAuth2 do
 
   defp strategy_check(grant_type) do
     unless Map.has_key?(@strategies, String.to_atom(grant_type)) do
-      raise Authable.SuspiciousActivityError,
+      raise Authable.Error.SuspiciousActivity,
         message: "Strategy for '#{grant_type}' is not enabled!"
     end
   end

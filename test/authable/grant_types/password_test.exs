@@ -1,9 +1,9 @@
-defmodule Authable.GrantTypes.PasswordTest do
+defmodule Authable.GrantType.PasswordTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.GrantTypes.Password, as: PasswordGrantType
+  alias Authable.GrantType.Password, as: PasswordGrantType
 
   setup do
     resource_owner = insert(:user)

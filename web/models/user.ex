@@ -1,4 +1,4 @@
-defmodule Authable.Models.User do
+defmodule Authable.Model.User do
   @moduledoc """
   Oauth2 resource owner
   """

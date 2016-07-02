@@ -34,7 +34,10 @@ defmodule Authable.Factory do
     %@token_store{
       name: "session_token",
       value: "st1234567890",
-      expires_at: Timex.Time.now(:seconds) + 3600
+      expires_at: Timex.Time.now(:seconds) + 3600,
+      details: %{
+        scope: "session"
+      }
     }
   end
 

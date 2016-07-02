@@ -11,7 +11,7 @@ The package can be installed as:
   If you need install for ecto versions > 2.0, then use
 
         def deps do
-          [{:authable, "~> 0.5.0"}]
+          [{:authable, "~> 0.6.0"}]
         end
 
   If you need install for ecto versions > 1.0 and < 2.0, then use
@@ -31,10 +31,10 @@ The package can be installed as:
         config :authable,
           ecto_repos: [Authable.Repo],
           repo: Authable.Repo,
-          resource_owner: Authable.Models.User,
-          token_store: Authable.Models.Token,
-          client: Authable.Models.Client,
-          app: Authable.Models.App,
+          resource_owner: Authable.Model.User,
+          token_store: Authable.Model.Token,
+          client: Authable.Model.Client,
+          app: Authable.Model.App,
           expires_in: %{
             access_token: 3600,
             refresh_token: 24 * 3600,
@@ -42,16 +42,16 @@ The package can be installed as:
             session_token: 30 * 24 * 3600
           },
           strategies: %{
-            authorization_code: Authable.AuthorizationCodeGrantType,
-            client_credentials: Authable.ClientCredentialsGrantType,
-            password: Authable.PasswordGrantType,
-            refresh_token: Authable.RefreshTokenGrantType
+            authorization_code: Authable.GrantType.AuthorizationCode,
+            client_credentials: Authable.GrantType.ClientCredentials,
+            password: Authable.GrantType.Password,
+            refresh_token: Authable.GrantType.RefreshToken
           },
           scopes: ~w(read write session)
 
   If you want to disable a strategy then delete from strategies config.
 
-  If you want to add a new strategy then add your own module with `authorize(params)` function and return a `Authable.Models.Token` struct.
+  If you want to add a new strategy then add your own module with `authorize(params)` function and return a `Authable.Model.Token` struct.
 
   4. Add database configurations for the `Authable.Repo` on env config files:
 
@@ -75,7 +75,7 @@ Please refer to hex docs for each module, function details and samples https://h
 
 ### Generic Token Storage
 
-To handle all possible token types, a generic token storage scheme is used for `Authable.Models.Token`. So, it can be used for all OAuth2 tokens and any other token scheme like confirmation token, password recovery tokens, mail list tokens, session tokens and etc...
+To handle all possible token types, a generic token storage scheme is used for `Authable.Model.Token`. So, it can be used for all OAuth2 tokens and any other token scheme like confirmation token, password recovery tokens, mail list tokens, session tokens and etc...
 
       :name, :string # Name of the token
       :value, :string # Value of the token
@@ -89,7 +89,7 @@ To authorize an app `Authable.OAuth2.authorize_app/2` function can be used.
 
 ### Generating Access Token
 
-Authable has 4 grant types (authorization_code, password, client_credentials and refresh_token) to get an access token by default. To extend or use your own grant-type strategy, add your strategy into config and implement `authorize(params)` function and return a `Authable.Models.Token` struct.
+Authable has 4 grant types (authorization_code, password, client_credentials and refresh_token) to get an access token by default. To extend or use your own grant-type strategy, add your strategy into config and implement `authorize(params)` function and return a `Authable.Model.Token` struct.
 
 `Authable.OAuth2.authorize(params)` will automatically determine which strategy to use by grant type. Then it authorize client and returns an access token to make further requests to resource server.
 
@@ -101,7 +101,7 @@ Authable has 2 main authentication patterns,
 1) Basic Authentication header resolver and
 2) Token Authentication, including `Bearer` token and `Session` token.
 
-All authentication patterns return on success a `Authable.Models.User` struct and on all other conditions it returns nil.
+All authentication patterns return on success a `Authable.Model.User` struct and on all other conditions it returns nil.
 
 ## Test
 
