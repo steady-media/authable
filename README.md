@@ -118,7 +118,6 @@ Configure your application OAuth2 scopes on configuration. Then add `import Auth
 
         defmodule SomeModule.AppController do
           use SomeModule.Web, :controller
-          use Authable.Plug.Authenticate
 
           plug Authable.Plug.Authenticate [scopes: "read, write"] when action in [:create]
 
@@ -143,6 +142,8 @@ Configure your application OAuth2 scopes on configuration. Then add `import Auth
             # only not logged in user can access this action
           end
         end
+
+On failure of authentication, authable renders as a RestApi json format, if you need to change the format file you need to implement the behaviour of `Authable.Renderer` and then change the `renderer` configuration.
 
 ### OAuth2 Authorization
 
@@ -188,6 +189,8 @@ To authorize a client for resources, all you need to do is calling `OAuth2.autho
           "scope" => "read" # optional
         %})
 
+        # You may adjust token expiration durations from configuration.
+
 ### How a 'OAuth2 Resource Owner' can authorize clients?
 
 Authorizing client may mean installing client or giving permission to a client to make OAuth2 Authorization requests and allowing resources with selected scopes. To authorize a client for a resource owner, you need to call `OAuth2.authorize_app` function.
@@ -199,6 +202,14 @@ Authorizing client may mean installing client or giving permission to a client t
           "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
           "scope" => "read,write"
         %})
+
+### Changing models
+
+To change models, you have two options:
+
+1) You may change the module name from configuration
+
+2) You may copy Authabe.Model.XXX and update it on your app.
 
 ## Test
 

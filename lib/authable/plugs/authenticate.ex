@@ -42,7 +42,6 @@ defmodule Authable.Plug.Authenticate do
 
       defmodule SomeModule.AppController do
         use SomeModule.Web, :controller
-        use Authable.Plug.Authenticate
 
         plug Authable.Plug.Authenticate [scopes: "read, write"] when action in [:create]
 
