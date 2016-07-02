@@ -36,16 +36,14 @@ defmodule Authable.AuthStrategy.SessionTest do
   end
 
   test "returns error when authenticates with session using invalid data", %{conn: conn} do
-    user = insert(:user)
-    token = insert(:session_token, user_id: user.id)
+    insert(:session_token, user_id: insert(:user).id)
     conn = conn |> sign_conn |> put_session(:session_token, "wrong_session_val")
-    {result, errors, status} = SessionAuthStrategy.authenticate(conn, [])
+    {result, _, _} = SessionAuthStrategy.authenticate(conn, [])
     assert result == :error
   end
 
   test "returns nil when authenticates when session key not exists", %{conn: conn} do
-    user = insert(:user)
-    token = insert(:session_token, user_id: user.id)
+    insert(:session_token, user_id: insert(:user).id)
     conn = conn |> sign_conn
     assert SessionAuthStrategy.authenticate(conn, []) == nil
   end

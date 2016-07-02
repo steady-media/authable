@@ -22,7 +22,7 @@ defmodule Authable.AuthStrategy.QueryParamTest do
   test "returns :error when fails to authenticates with access_token query string using invalid data", %{conn: conn} do
     params = %{"access_token" => "invalid"}
     conn = conn |> fetch_query_params |> Map.put(:query_params, params)
-    {result, errors, status} = QueryParamStrategy.authenticate(conn, [])
+    {result, _, _} = QueryParamStrategy.authenticate(conn, [])
     assert result == :error
   end
 

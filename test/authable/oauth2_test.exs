@@ -64,7 +64,7 @@ defmodule Authable.OAuth2Test do
                     redirect_uri: @redirect_uri)
     params = %{"client_id" => client.id, "redirect_uri" => "https://xyz.com/nx",
                "scope" => @scopes}
-    {:error, errors, http_status_code} = OAuth2.authorize_app(resource_owner,
+    {:error, _, http_status_code} = OAuth2.authorize_app(resource_owner,
       params)
     assert http_status_code == :unauthorized
   end

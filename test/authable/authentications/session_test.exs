@@ -8,8 +8,7 @@ defmodule Authable.Authentication.SessionTest do
   @session_token_value "session_token_1234"
 
   setup do
-    user = insert(:user)
-    insert(:session_token, %{value: @session_token_value, user: user})
+    insert(:session_token, %{value: @session_token_value, user: insert(:user)})
     :ok
   end
 

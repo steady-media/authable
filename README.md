@@ -150,7 +150,7 @@ Currently, authable library supports by default `authorization code`, `client cr
 
 #### Examples
 
-To authorize a client for resources, all you need to do is calling `OAuth2.authorize` method with necessary params, on successful authorization `Authable.Model.Token struct will return, on failure {:error, errors, http_status_code}.
+To authorize a client for resources, all you need to do is calling `OAuth2.authorize` method with necessary params, on successful authorization `Authable.Model.Token` struct will return, on failure `{:error, errors, http_status_code}`.
 
         # For authorization_code grant type
         Authable.OAuth2.authorize(%{

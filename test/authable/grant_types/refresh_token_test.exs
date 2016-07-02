@@ -23,13 +23,13 @@ defmodule Authable.GrantType.RefreshTokenTest do
 
   test "can not insert access_token more than one with a token with same refresh_token params", %{params: params} do
     RefreshTokenGrantType.authorize(params)
-    {:error, errors, http_status} = RefreshTokenGrantType.authorize(params)
+    {:error, _, http_status} = RefreshTokenGrantType.authorize(params)
     assert http_status == :unauthorized
   end
 
   test "fails if app is deleted by resource_owner", %{params: params, app: app} do
     @repo.delete!(app)
-    {:error, errors, http_status} = RefreshTokenGrantType.authorize(params)
+    {:error, _, http_status} = RefreshTokenGrantType.authorize(params)
     assert http_status == :unauthorized
   end
 end

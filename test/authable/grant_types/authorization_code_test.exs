@@ -30,7 +30,7 @@ defmodule Authable.GrantType.AuthorizationCodeTest do
 
   test "can not insert access_token more than one with a token with same authorization_code params", %{params: params} do
     AuthorizationCodeGrantType.authorize(params)
-    {:error, errors, http_status} = AuthorizationCodeGrantType.authorize(params)
+    {:error, _, http_status} = AuthorizationCodeGrantType.authorize(params)
     assert http_status == :unauthorized
   end
 end
