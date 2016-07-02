@@ -29,12 +29,18 @@ defmodule Authable.Authentication.Basic do
       # to the function, it will return resource-owner
       Authable.Authentication.Basic.authenticate(
         "Zm9vQGV4YW1wbGUuY29tOjEyMzQ1Njc4", [])
+
+      Authable.Authentication.Basic.authenticate(
+        "Basic Zm9vQGV4YW1wbGUuY29tOjEyMzQ1Njc4", [])
   """
   def authenticate(auth_credentials, _required_scopes) do
     authenticate_with_credentials(auth_credentials)
   end
 
   defp authenticate_with_credentials(auth_credentials) do
+    auth_credentials = auth_credentials
+                       |> String.split(" ", trim: true)
+                       |> List.last
     case Base.decode64(auth_credentials) do
       {:ok, credentials} ->
         [email, password] = String.split(credentials, ":")

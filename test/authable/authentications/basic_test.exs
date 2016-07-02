@@ -15,4 +15,10 @@ defmodule Authable.Authentication.BasicTest do
     authorized_user = BasicAuthentication.authenticate(basic_auth_token, [])
     refute is_nil(authorized_user)
   end
+
+  test "authorize with basic authentication hash using Basic prefix", %{basic_auth_token: basic_auth_token} do
+    authorized_user = BasicAuthentication.authenticate(
+      "Basic ${basic_auth_token}", [])
+    refute is_nil(authorized_user)
+  end
 end

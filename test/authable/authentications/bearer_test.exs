@@ -19,6 +19,12 @@ defmodule Authable.Authentication.BearerTest do
     refute is_nil(authorized_user)
   end
 
+  test "authorize with bearer authentication using Bearer prefix" do
+    {:ok, authorized_user} = BearerAuthentication.authenticate(
+      "Bearer #{@access_token_value}", [])
+    refute is_nil(authorized_user)
+  end
+
   test "authorize with bearer authentication from map parameters" do
     {:ok, authorized_user} = BearerAuthentication.authenticate(
       %{"access_token" => @access_token_value}, [])

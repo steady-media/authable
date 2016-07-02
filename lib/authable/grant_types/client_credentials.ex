@@ -64,8 +64,8 @@ defmodule Authable.GrantType.ClientCredentials do
   defp validate_token_scope({:error, err, code}, _), do: {:error, err, code}
   defp validate_token_scope({:ok, client}, ""), do: {:ok, client}
   defp validate_token_scope({:ok, client}, required_scopes) do
-    scopes = @scopes |> String.split(",")
-    required_scopes = required_scopes |> String.split(",")
+    scopes = @scopes |> String.split(",", trim: true)
+    required_scopes = required_scopes |> String.split(",", trim: true)
     if Enum.find(required_scopes, fn(required_scope) ->
         Enum.member?(scopes, required_scope) == false end) do
       {:error, %{invalid_scope:

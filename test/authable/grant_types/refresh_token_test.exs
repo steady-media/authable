@@ -23,7 +23,6 @@ defmodule Authable.GrantType.RefreshTokenTest do
 
   test "can not insert access_token more than one with a token with same refresh_token params", %{params: params} do
     RefreshTokenGrantType.authorize(params)
-    IO.inspect(RefreshTokenGrantType.authorize(params))
     {:error, errors, http_status} = RefreshTokenGrantType.authorize(params)
     assert http_status == :unauthorized
   end

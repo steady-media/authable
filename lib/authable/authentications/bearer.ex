@@ -21,27 +21,18 @@ defmodule Authable.Authentication.Bearer do
       # it will return resource-owner.
       Authable.Authentication.Bearer.authenticate(
        %{"access_token" => "at123456789"}, ["read"])
+      # or
+      Authable.Authentication.Bearer.authenticate("at123456789", ["read"])
+      # or
+      Authable.Authentication.Bearer.authenticate("Bearer at123456789",
+        ["read"])
   """
   def authenticate(%{"access_token" => access_token}, required_scopes) do
     authenticate(access_token, required_scopes)
   end
 
-  @doc """
-  Authenticates resource-owner using access_token token value.
-
-  It matches resource owner with given access_token. If any resource owner
-  matched given credentials, it returns {:ok, resource owner struct}, otherwise
-  {:error, Map, :http_status_code}
-
-  ## Examples
-
-      # Suppose we have a access_token at 'token store(Authable.Token)'
-      # with token value "at123456789"
-      # If we pass the token value to the function,
-      # it will return resource-owner.
-      Authable.Authentication.Bearer.authenticate("at123456789")
-  """
   def authenticate(access_token, required_scopes) do
+    access_token = access_token |> String.split(" ", trim: true) |> List.last
     case TokenAuthentication.authenticate(
       {"access_token", access_token}, required_scopes) do
         {:ok, user} -> {:ok, user}
