@@ -1,6 +1,7 @@
 defmodule Authable.Authentication.Session do
   @moduledoc """
-  Bearer authencation helper module
+  Bearer authencation helper module, implements Authable.Authentication
+  behaviour.
   """
 
   alias Authable.Authentication.Token, as: TokenAuthentication
@@ -30,11 +31,9 @@ defmodule Authable.Authentication.Session do
       {"session_token", session_token}, []) do
         {:ok, user} -> {:ok, user}
         {:error, errors, status} -> {:error,
-          Map.put(errors, :headers, session_error_headers), status}
+          Map.put(errors, :headers, error_headers), status}
     end
   end
 
-  defp session_error_headers do
-    [%{"www-authenticate" => "Cookie realm=\"authable\""}]
-  end
+  defp error_headers, do: [%{"www-authenticate" => "Cookie realm=\"authable\""}]
 end

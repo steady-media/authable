@@ -13,7 +13,7 @@ defmodule Authable.Factory do
 
   def user_factory do
     %@resource_owner{
-      email: sequence(:email, &"email-#{&1}@example.com"),
+      email: sequence(:email, &"foo-#{&1}@example.com"),
       password: Comeonin.Bcrypt.hashpwsalt("12345678")
     }
   end
@@ -33,18 +33,16 @@ defmodule Authable.Factory do
   def session_token_factory do
     %@token_store{
       name: "session_token",
-      value: "st1234567890",
+      value: sequence(:value, &"st#{&1}"),
       expires_at: Timex.Time.now(:seconds) + 3600,
-      details: %{
-        scope: "session"
-      }
+      details: %{scope: "session,read,write"}
     }
   end
 
   def access_token_factory do
     %@token_store{
       name: "access_token",
-      value: "at1234567890",
+      value: sequence(:value, &"at#{&1}"),
       expires_at: Timex.Time.now(:seconds) + 3600,
       details: %{
         scope: "read",
@@ -56,7 +54,7 @@ defmodule Authable.Factory do
   def refresh_token_factory do
     %@token_store{
       name: "refresh_token",
-      value: "rt1234567890",
+      value: sequence(:value, &"rt#{&1}"),
       expires_at: Timex.Time.now(:seconds) + 3600,
       details: %{
         grant_type: "authorization_code",
@@ -68,7 +66,7 @@ defmodule Authable.Factory do
   def authorization_code_factory do
     %@token_store{
       name: "authorization_code",
-      value: "a0123456789c",
+      value: sequence(:value, &"ac#{&1}"),
       expires_at: Timex.Time.now(:seconds) + 900,
       details: %{
         scope: "read",

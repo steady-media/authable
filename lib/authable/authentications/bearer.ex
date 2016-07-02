@@ -1,6 +1,7 @@
 defmodule Authable.Authentication.Bearer do
   @moduledoc """
-  Bearer authencation helper module
+  Bearer authencation helper module, implements Authable.Authentication
+  behaviour.
   """
 
   alias Authable.Authentication.Token, as: TokenAuthentication
@@ -31,22 +32,23 @@ defmodule Authable.Authentication.Bearer do
     authenticate(access_token, required_scopes)
   end
 
+  def authenticate("Bearer " <> access_token, required_scopes), do:
+    authenticate(access_token, required_scopes)
   def authenticate(access_token, required_scopes) do
-    access_token = access_token |> String.split(" ", trim: true) |> List.last
     case TokenAuthentication.authenticate(
       {"access_token", access_token}, required_scopes) do
         {:ok, user} -> {:ok, user}
         {:error, errors, status} -> {:error,
-          Map.put(errors, :headers, bearer_error_header(errors)), status}
+          Map.put(errors, :headers, error_headers(errors)), status}
     end
   end
 
-  defp bearer_error_header(errors) do
-    error_message = generate_error_message(errors)
+  defp error_headers(errors) do
+    error_message = generate_error_header_message(errors)
     [%{"www-authenticate" => "Bearer realm=\"authable\", ${error_message}"}]
   end
 
-  defp generate_error_message(errors) do
+  defp generate_error_header_message(errors) do
     "error=\"${Map.keys(errors)}\",
       error_description=\"${Map.values(errors)}\""
   end

@@ -3,19 +3,19 @@ defmodule Authable.OAuth2 do
   OAut2 authorization strategy router
   """
 
-  import Ecto.Query, only: [where: 2]
+  import Ecto.Query, only: [where: 2, where: 3, from: 2]
 
   @repo Application.get_env(:authable, :repo)
   @token_store Application.get_env(:authable, :token_store)
   @client Application.get_env(:authable, :client)
   @app Application.get_env(:authable, :app)
-  @strategies Application.get_env(:authable, :strategies)
+  @grant_types Application.get_env(:authable, :grant_types)
   @scopes Application.get_env(:authable, :scopes)
 
   @doc """
   Calls appropriate module authorize function for given grant type.
 
-  It simply authorizes based on allowed strategies in configuration and then
+  It simply authorizes based on allowed grant types in configuration and then
   returns access token as @token_store(Authable.Model.Token) model.
 
   ## Examples
@@ -58,7 +58,7 @@ defmodule Authable.OAuth2 do
   """
   def authorize(params) do
     strategy_check(params["grant_type"])
-    @strategies[String.to_atom(params["grant_type"])].authorize(params)
+    @grant_types[String.to_atom(params["grant_type"])].authorize(params)
   end
 
   @doc """
@@ -115,8 +115,8 @@ defmodule Authable.OAuth2 do
 
   ## Examples
 
-      # For authorization_code grant type
-      Authable.OAuth2.authorize_app(user, %{
+      # For revoking client(uninstall app)
+      Authable.OAuth2.revoke_app_authorization(user, %{
         "id" => "12024ca6-192b-469d-bfb6-9b45023ad13e"
       %})
   """
@@ -124,21 +124,13 @@ defmodule Authable.OAuth2 do
     app = @repo.get_by!(@app, id: id, user_id: user.id)
     @repo.delete!(app)
 
-    tokens = @token_store
-    |> where(user_id: ^user.id)
-    |> @repo.all
-
-    Enum.map(tokens, fn token ->
-        if token.details &&
-           Map.get(token.details, "client_id", "") == app.client_id do
-          @repo.delete!(token)
-        end
-      end
-    )
+    query = (from t in @token_store, where: t.user_id == ^app.user_id and
+      fragment("?->>'client_id' = ?", t.details, ^app.client_id))
+    @repo.delete_all(query)
   end
 
   defp strategy_check(grant_type) do
-    unless Map.has_key?(@strategies, String.to_atom(grant_type)) do
+    unless Map.has_key?(@grant_types, String.to_atom(grant_type)) do
       raise Authable.Error.SuspiciousActivity,
         message: "Strategy for '#{grant_type}' is not enabled!"
     end

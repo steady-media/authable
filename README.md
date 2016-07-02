@@ -41,7 +41,7 @@ The package can be installed as:
             authorization_code: 300,
             session_token: 30 * 24 * 3600
           },
-          strategies: %{
+          grant_types: %{
             authorization_code: Authable.GrantType.AuthorizationCode,
             client_credentials: Authable.GrantType.ClientCredentials,
             password: Authable.GrantType.Password,
@@ -49,9 +49,9 @@ The package can be installed as:
           },
           scopes: ~w(read write session)
 
-  If you want to disable a strategy then delete from strategies config.
+  If you want to disable a grant type then delete from grant types config.
 
-  If you want to add a new strategy then add your own module with `authorize(params)` function and return a `Authable.Model.Token` struct.
+  If you want to add a new grant type then add your own module with `authorize(params)` function and return a `Authable.Model.Token` struct.
 
   4. Add database configurations for the `Authable.Repo` on env config files:
 

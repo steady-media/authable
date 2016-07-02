@@ -1,8 +1,9 @@
 defmodule Authable.Authentication.Token do
   @moduledoc """
-  Base token authentication helper. Differently from Bearer or Session, this
-  module is a generic helper module. It enables to match with any token type
-  from 'token store(Authable.Token)'.
+  Base token authentication helper, implements Authable.Authentication
+  behaviour. Differently from Bearer or Session, this module is a generic
+  helper module. It enables to match with any token type from
+  'token store(Authable.Token)'.
   """
 
   import Authable.Authentication.Base

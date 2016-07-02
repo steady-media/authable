@@ -1,6 +1,7 @@
 defmodule Authable.Authentication.Basic do
   @moduledoc """
-  Basic authentication helper module
+  Basic authentication helper module, implements Authable.Authentication
+  behaviour.
   """
 
   alias Authable.Utils.Crypt, as: CryptUtil
@@ -37,15 +38,15 @@ defmodule Authable.Authentication.Basic do
     authenticate_with_credentials(auth_credentials)
   end
 
+  defp authenticate_with_credentials("Basic " <> auth_credentials), do:
+    authenticate_with_credentials(auth_credentials)
   defp authenticate_with_credentials(auth_credentials) do
-    auth_credentials = auth_credentials
-                       |> String.split(" ", trim: true)
-                       |> List.last
     case Base.decode64(auth_credentials) do
       {:ok, credentials} ->
         [email, password] = String.split(credentials, ":")
         authenticate_with_credentials(email, password)
-      :error -> {:error, %{invalid_hash: "Invalid credentials encoding."},
+      :error -> {:error, %{invalid_hash: "Invalid credentials encoding.",
+        headers: error_headers},
         :unauthorized}
     end
   end
@@ -66,4 +67,6 @@ defmodule Authable.Authentication.Basic do
   defp match_with_user_password(password, user) do
     CryptUtil.match_password(password, Map.get(user, :password, ""))
   end
+
+  defp error_headers, do: [%{"www-authenticate" => "Basic realm=\"authable\""}]
 end

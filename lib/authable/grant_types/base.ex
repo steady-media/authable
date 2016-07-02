@@ -6,7 +6,7 @@ defmodule Authable.GrantType.Base do
   @repo Application.get_env(:authable, :repo)
   @token_store Application.get_env(:authable, :token_store)
   @app Application.get_env(:authable, :app)
-  @strategies Application.get_env(:authable, :strategies)
+  @grant_types Application.get_env(:authable, :grant_types)
 
   @doc """
   A common function to generate oauth2 tokens (access_token and refresh_token)
@@ -40,7 +40,7 @@ defmodule Authable.GrantType.Base do
     }
 
     token_params =
-      if @strategies[:refresh_token] do
+      if @grant_types[:refresh_token] do
         # create refresh_token
         refresh_token_changeset = @token_store.refresh_token_changeset(
           %@token_store{}, token_params
