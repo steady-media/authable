@@ -34,7 +34,7 @@ defmodule Authable.Plug.UnauthorizedOnlyTest do
     token = insert(:session_token, user_id: user.id, details: %{scope: "read"})
     conn = conn |> sign_conn |> put_session(:session_token, token.value)
     conn = UnauthorizedOnlyPlug.call(conn, [])
-    assert conn.state == :sent
+    assert conn.state == :set
     assert conn.status == 400
     assert is_nil(conn.assigns[:current_user])
   end

@@ -61,18 +61,16 @@ defmodule Authable.Plug.Authenticate do
 
   defp response_conn_with(conn, nil) do
     conn
-    |> put_status(:forbidden)
     |> put_resp_header("www-authenticate", "Bearer realm=\"authable\"")
-    |> @rederer.render(%{errors: %{detail: "Resource access requires authentication!"}})
+    |> @rederer.render(:forbidden, %{errors: %{detail: "Resource access requires authentication!"}})
     |> halt
   end
   defp response_conn_with(conn, {:error, errors, http_status_code}) do
     [%{"www-authenticate" => header_val}] = errors[:headers]
     errors = %{errors: Map.delete(errors, :headers)}
     conn
-    |> put_status(http_status_code)
     |> put_resp_header("www-authenticate", header_val)
-    |> @rederer.render(errors)
+    |> @rederer.render(http_status_code, %{errors: errors})
     |> halt
   end
   defp response_conn_with(conn, {:ok, current_user}), do: assign(conn,
