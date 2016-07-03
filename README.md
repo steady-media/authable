@@ -1,4 +1,4 @@
-# Authable [![Deps Status](https://beta.hexfaktor.org/badge/all/github/mustafaturan/authable.svg)](https://beta.hexfaktor.org/github/mustafaturan/authable)
+# Authable
 
 OAuth2 Provider implementation modules and helpers using `plug`, `ecto` and `postgress` for any `elixir` application.
 
@@ -238,3 +238,8 @@ Authable is an extensible module, you can create your strategy and share as hex 
 ## References
 
 https://tools.ietf.org/html/rfc6749
+
+## Badges
+
+[![Build Status](https://travis-ci.org/mustafaturan/authable.svg?branch=master)](https://travis-ci.org/mustafaturan/authable)
+[![Deps Status](https://beta.hexfaktor.org/badge/all/github/mustafaturan/authable.svg)](https://beta.hexfaktor.org/github/mustafaturan/authable)
