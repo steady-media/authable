@@ -87,6 +87,6 @@ defmodule Authable.Model.Token do
 
   defp put_app_scopes(model_changeset) do
     scopes = Enum.join(Application.get_env(:authable, :scopes), ",")
-    put_change(model_changeset, :details, %{scopes: scopes})
+    put_change(model_changeset, :details, %{scope: scopes})
   end
 end
