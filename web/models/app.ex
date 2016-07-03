@@ -1,4 +1,4 @@
-defmodule Authable.Models.App do
+defmodule Authable.Model.App do
   @moduledoc """
   Installed apps
   """

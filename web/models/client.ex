@@ -1,4 +1,4 @@
-defmodule Authable.Models.Client do
+defmodule Authable.Model.Client do
   @moduledoc """
   Oauth2 client
   """
@@ -17,6 +17,7 @@ defmodule Authable.Models.Client do
     field :secret, :string
     field :redirect_uri, :string
     field :settings, :map
+    field :priv_settings, :map
     belongs_to :user, @resource_owner
     has_many :apps, @app
 
@@ -24,7 +25,7 @@ defmodule Authable.Models.Client do
   end
 
   @required_fields ~w(name redirect_uri user_id)
-  @optional_fields ~w(settings)
+  @optional_fields ~w(settings priv_settings)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

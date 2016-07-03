@@ -1,9 +1,9 @@
-defmodule Authable.Authentications.BearerTest do
+defmodule Authable.Authentication.BearerTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.Authentications.Bearer, as: BearerAuthentication
+  alias Authable.Authentication.Bearer, as: BearerAuthentication
 
   @access_token_value "access_token_1234"
 
@@ -14,14 +14,20 @@ defmodule Authable.Authentications.BearerTest do
   end
 
   test "authorize with bearer authentication" do
-    authorized_user = BearerAuthentication.authenticate(
-      @access_token_value)
+    {:ok, authorized_user} = BearerAuthentication.authenticate(
+      @access_token_value, [])
+    refute is_nil(authorized_user)
+  end
+
+  test "authorize with bearer authentication using Bearer prefix" do
+    {:ok, authorized_user} = BearerAuthentication.authenticate(
+      "Bearer #{@access_token_value}", [])
     refute is_nil(authorized_user)
   end
 
   test "authorize with bearer authentication from map parameters" do
-    authorized_user = BearerAuthentication.authenticate(
-      %{"access_token" => @access_token_value})
+    {:ok, authorized_user} = BearerAuthentication.authenticate(
+      %{"access_token" => @access_token_value}, [])
     refute is_nil(authorized_user)
   end
 end

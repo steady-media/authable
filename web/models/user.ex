@@ -1,4 +1,4 @@
-defmodule Authable.Models.User do
+defmodule Authable.Model.User do
   @moduledoc """
   Oauth2 resource owner
   """
@@ -17,6 +17,7 @@ defmodule Authable.Models.User do
     field :email, :string
     field :password, :string
     field :settings, :map
+    field :priv_settings, :map
     has_many :clients, @client
     has_many :tokens, @token_store
     has_many :apps, @app
@@ -25,7 +26,7 @@ defmodule Authable.Models.User do
   end
 
   @required_fields ~w(email password)
-  @optional_fields ~w(settings)
+  @optional_fields ~w(settings priv_settings)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

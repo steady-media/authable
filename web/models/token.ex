@@ -1,4 +1,4 @@
-defmodule Authable.Models.Token do
+defmodule Authable.Model.Token do
   @moduledoc """
   Oauth2 token store
   """
@@ -65,6 +65,7 @@ defmodule Authable.Models.Token do
     model
     |> changeset(params)
     |> put_token_name("session_token")
+    |> put_app_scopes
     |> put_expires_at(Time.now(:seconds) + @expires_in[:session_token])
   end
 
@@ -82,5 +83,10 @@ defmodule Authable.Models.Token do
 
   defp put_expires_at(model_changeset, expires_at) do
     put_change(model_changeset, :expires_at, expires_at)
+  end
+
+  defp put_app_scopes(model_changeset) do
+    scopes = Enum.join(Application.get_env(:authable, :scopes), ",")
+    put_change(model_changeset, :details, %{scopes: scopes})
   end
 end

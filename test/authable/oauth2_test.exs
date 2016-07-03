@@ -5,7 +5,7 @@ defmodule Authable.OAuth2Test do
   import Authable.Factory
   import Ecto.Query, only: [where: 2]
   alias Authable.OAuth2
-  alias Authable.SuspiciousActivityError
+  alias Authable.Error.SuspiciousActivity, as: SuspiciousActivityError
 
   @redirect_uri "https://xyz.com/rd"
   @scopes "read"
@@ -64,7 +64,9 @@ defmodule Authable.OAuth2Test do
                     redirect_uri: @redirect_uri)
     params = %{"client_id" => client.id, "redirect_uri" => "https://xyz.com/nx",
                "scope" => @scopes}
-    assert is_nil(OAuth2.authorize_app(resource_owner, params))
+    {:error, _, http_status_code} = OAuth2.authorize_app(resource_owner,
+      params)
+    assert http_status_code == :unprocessable_entity
   end
 
   test "deletes app and user's all client tokens" do

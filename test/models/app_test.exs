@@ -1,4 +1,4 @@
-defmodule Authable.Models.AppTest do
+defmodule Authable.Model.AppTest do
   use Authable.ModelCase
   import Authable.Factory
 

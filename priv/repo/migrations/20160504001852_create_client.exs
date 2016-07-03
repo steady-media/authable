@@ -8,6 +8,7 @@ defmodule Authable.Repo.Migrations.CreateClient do
       add :secret, :string
       add :redirect_uri, :string
       add :settings, :jsonb
+      add :priv_settings, :jsonb
       add :user_id, references(:users, on_delete: :delete_all, type: :uuid)
 
       timestamps

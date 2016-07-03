@@ -1,6 +1,6 @@
-defmodule Authable.SuspiciousActivityError do
+defmodule Authable.Error.SuspiciousActivity do
   @moduledoc """
-  SuspiciousActivityError exception type
+  SuspiciousActivity exception type
   """
 
   defexception message: "suspicious_activity_error"

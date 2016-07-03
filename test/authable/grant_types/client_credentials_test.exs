@@ -1,9 +1,9 @@
-defmodule Authable.GrantTypes.ClientCredentialsTest do
+defmodule Authable.GrantType.ClientCredentialsTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.GrantTypes.ClientCredentials, as: ClientCredentialsGrantType
+  alias Authable.GrantType.ClientCredentials, as: ClientCredentialsGrantType
 
   setup do
     client_owner = insert(:user)

@@ -1,6 +1,6 @@
 # Authable [![Deps Status](https://beta.hexfaktor.org/badge/all/github/mustafaturan/authable.svg)](https://beta.hexfaktor.org/github/mustafaturan/authable)
 
-OAuth2 Provider implementation modules and helpers using `ecto` and `postgress` for any `elixir` application.
+OAuth2 Provider implementation modules and helpers using `plug`, `ecto` and `postgress` for any `elixir` application.
 
 ## Installation
 
@@ -8,16 +8,10 @@ The package can be installed as:
 
   1. Add authable to your list of dependencies in `mix.exs`:
 
-  If you need install for ecto versions > 2.0, then use
+  Only for ecto versions > 2.0
 
         def deps do
-          [{:authable, "~> 0.5.0"}]
-        end
-
-  If you need install for ecto versions > 1.0 and < 2.0, then use
-
-        def deps do
-          [{:authable, "~> 0.4.0"}]
+          [{:authable, "~> 0.6.0"}]
         end
 
   2. Ensure authable is started before your application:
@@ -31,27 +25,45 @@ The package can be installed as:
         config :authable,
           ecto_repos: [Authable.Repo],
           repo: Authable.Repo,
-          resource_owner: Authable.Models.User,
-          token_store: Authable.Models.Token,
-          client: Authable.Models.Client,
-          app: Authable.Models.App,
+          resource_owner: Authable.Model.User,
+          token_store: Authable.Model.Token,
+          client: Authable.Model.Client,
+          app: Authable.Model.App,
           expires_in: %{
             access_token: 3600,
             refresh_token: 24 * 3600,
             authorization_code: 300,
             session_token: 30 * 24 * 3600
           },
-          strategies: %{
-            authorization_code: Authable.AuthorizationCodeGrantType,
-            client_credentials: Authable.ClientCredentialsGrantType,
-            password: Authable.PasswordGrantType,
-            refresh_token: Authable.RefreshTokenGrantType
+          grant_types: %{
+            authorization_code: Authable.GrantType.AuthorizationCode,
+            client_credentials: Authable.GrantType.ClientCredentials,
+            password: Authable.GrantType.Password,
+            refresh_token: Authable.GrantType.RefreshToken
           },
-          scopes: ~w(read write session)
+          auth_strategies: %{
+            headers: %{
+              "authorization" => [
+                {~r/Basic ([a-zA-Z\-_\+=]+)/, Authable.Authentication.Basic},
+                {~r/Bearer ([a-zA-Z\-_\+=]+)/, Authable.Authentication.Bearer},
+              ],
+              "x-api-token" => [
+                {~r/([a-zA-Z\-_\+=]+)/, Authable.Authentication.Bearer}
+              ]
+            },
+            query_params: %{
+              "access_token" => Authable.Authentication.Bearer
+            },
+            sessions: %{
+              "session_token" => Authable.Authentication.Session
+            }
+          },
+          scopes: ~w(read write session),
+          renderer: Authable.Rederer.RestApi
 
-  If you want to disable a strategy then delete from strategies config.
+  If you want to disable a grant type then delete from grant types config.
 
-  If you want to add a new strategy then add your own module with `authorize(params)` function and return a `Authable.Models.Token` struct.
+  If you want to add a new grant type then add your own module with `authorize(params)` function and return a `Authable.Model.Token` struct.
 
   4. Add database configurations for the `Authable.Repo` on env config files:
 
@@ -73,35 +85,131 @@ The package can be installed as:
 
 Please refer to hex docs for each module, function details and samples https://hexdocs.pm/authable.
 
-### Generic Token Storage
+### Authentication
 
-To handle all possible token types, a generic token storage scheme is used for `Authable.Models.Token`. So, it can be used for all OAuth2 tokens and any other token scheme like confirmation token, password recovery tokens, mail list tokens, session tokens and etc...
+Authable supports 3 main authentication types by default using Plug.Conn. You can add or remove authentication types using configuration. On successful authentication, resource owner automatically set on `conn.assigns[:current_user]` immutable.
 
-      :name, :string # Name of the token
-      :value, :string # Value of the token
-      :expires_at, :integer # Unix timestamp for when the token will expire
-      :details, :jsonb # Storage for all other information
-      :user_id # User(resource owner) foreign key
+1) Sessions
 
-### Authorizing an App (Install App)
+Reads session for configured `sessions` keys and passes to the matched authenticator to authenticate.
 
-To authorize an app `Authable.OAuth2.authorize_app/2` function can be used.
+2) Query Params
 
-### Generating Access Token
+Reads query params for configured `query_params` keys and passes to the matched authenticator to authenticate.
 
-Authable has 4 grant types (authorization_code, password, client_credentials and refresh_token) to get an access token by default. To extend or use your own grant-type strategy, add your strategy into config and implement `authorize(params)` function and return a `Authable.Models.Token` struct.
+3) Headers
 
-`Authable.OAuth2.authorize(params)` will automatically determine which strategy to use by grant type. Then it authorize client and returns an access token to make further requests to resource server.
+Reads headers for configured `headers` keys and passes to the matched authenticator to authenticate.
 
-Note: To enable a strategy add it to config and to disable a strategy remove from the config.
+#### Examples
 
-### Authentication Helpers
+Configure your application OAuth2 scopes on configuration. Then add `import Authable.Plug.Authenticate` with scopes into your controller.
 
-Authable has 2 main authentication patterns,
-1) Basic Authentication header resolver and
-2) Token Authentication, including `Bearer` token and `Session` token.
+        defmodule SomeModule.AppController do
+          use SomeModule.Web, :controller
+          plug Authable.Plug.Authenticate [scopes: ~w(read write)]
 
-All authentication patterns return on success a `Authable.Models.User` struct and on all other conditions it returns nil.
+          def index(conn, _params) do
+            # access to current user on successful authentication
+            current_user = conn.assigns[:current_user]
+            ...
+          end
+        end
+
+        defmodule SomeModule.AppController do
+          use SomeModule.Web, :controller
+
+          plug Authable.Plug.Authenticate [scopes: ~w(read write)] when action in [:create]
+
+          def index(conn, _params) do
+            # anybody can call this action
+            ...
+          end
+
+          def create(conn, _params) do
+            # only logged in users can access this action
+            current_user = conn.assigns[:current_user]
+            ...
+          end
+        end
+
+        # if you need to allow a resource only unauthorized then
+        defmodule SomeModule.AppController do
+          use SomeModule.Web, :controller
+          plug Authable.Plug.UnauthorizedOnly when action in [:register]
+
+          def register(conn, _params) do
+            # only not logged in user can access this action
+          end
+        end
+
+On failure of authentication, authable renders as a RestApi json format, if you need to change the format file you need to implement the behaviour of `Authable.Renderer` and then change the `renderer` configuration.
+
+### OAuth2 Authorization
+
+Currently, authable library supports by default `authorization code`, `client credentials`, `password`, and `refresh token` OAuth2 authorizations. You can add or remove grant types using configuration.
+
+#### Examples
+
+To authorize a client for resources, all you need to do is calling `OAuth2.authorize` method with necessary params, on successful authorization `Authable.Model.Token` struct will return, on failure `{:error, errors, http_status_code}`.
+
+        # For authorization_code grant type
+        Authable.OAuth2.authorize(%{
+          "grant_type" => "authorization_code",
+          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+          "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+          "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
+          "code" => "W_hb8JEDmeYChsNfOGCmbQ",
+          "scope" => "read" # optional
+        %})
+
+        # For client_credentials grant type
+        Authable.OAuth2.authorize(%{
+          "grant_type" => "client_credentials",
+          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+          "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+          "scope" => "read" # optional
+        %})
+
+        # For password grant type
+        Authable.OAuth2.authorize(%{
+          "grant_type" => "password",
+          "email" => "foo@example.com",
+          "password" => "12345678",
+          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+          "scope" => "read" # optional
+        %})
+
+        # For refresh_token grant type
+        Authable.OAuth2.authorize(%{
+          "grant_type" => "refresh_token",
+          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+          "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+          "refresh_token" => "XJaVz3lCFC9IfifBriA-dw",
+          "scope" => "read" # optional
+        %})
+
+        # You may adjust token expiration durations from configuration.
+
+### How a 'OAuth2 Resource Owner' can authorize clients?
+
+Authorizing client may mean installing client or giving permission to a client to make OAuth2 Authorization requests and allowing resources with selected scopes. To authorize a client for a resource owner, you need to call `OAuth2.authorize_app` function.
+
+#### Examples
+
+        Authable.OAuth2.authorize_app(user, %{
+          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+          "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
+          "scope" => "read,write"
+        %})
+
+### Changing models
+
+To change models, you have two options:
+
+1) You may change the module name from configuration
+
+2) You may copy Authabe.Model.XXX and update it on your app.
 
 ## Test
 
@@ -114,7 +222,9 @@ To run tests, jump into authable directory and run the command:
 ### Issues, Bugs, Documentation, Enhancements
 
 1) Fork the project
+
 2) Make your improvements and write your tests.
+
 3) Make a pull request.
 
 ### To add new strategy:

@@ -1,9 +1,9 @@
-defmodule Authable.Authentications.BasicTest do
+defmodule Authable.Authentication.BasicTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.Authentications.Basic, as: BasicAuthentication
+  alias Authable.Authentication.Basic, as: BasicAuthentication
 
   setup do
     user = insert(:user)
@@ -12,7 +12,13 @@ defmodule Authable.Authentications.BasicTest do
   end
 
   test "authorize with basic authentication hash", %{basic_auth_token: basic_auth_token} do
-    authorized_user = BasicAuthentication.authenticate(basic_auth_token)
+    authorized_user = BasicAuthentication.authenticate(basic_auth_token, [])
+    refute is_nil(authorized_user)
+  end
+
+  test "authorize with basic authentication hash using Basic prefix", %{basic_auth_token: basic_auth_token} do
+    authorized_user = BasicAuthentication.authenticate(
+      "Basic ${basic_auth_token}", [])
     refute is_nil(authorized_user)
   end
 end

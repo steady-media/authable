@@ -1,9 +1,9 @@
-defmodule Authable.GrantTypes.AuthorizationCodeTest do
+defmodule Authable.GrantType.AuthorizationCodeTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.GrantTypes.AuthorizationCode, as: AuthorizationCodeGrantType
+  alias Authable.GrantType.AuthorizationCode, as: AuthorizationCodeGrantType
 
   @scopes "read"
 
@@ -30,7 +30,7 @@ defmodule Authable.GrantTypes.AuthorizationCodeTest do
 
   test "can not insert access_token more than one with a token with same authorization_code params", %{params: params} do
     AuthorizationCodeGrantType.authorize(params)
-    second_token = AuthorizationCodeGrantType.authorize(params)
-    assert is_nil(second_token)
+    {:error, _, http_status} = AuthorizationCodeGrantType.authorize(params)
+    assert http_status == :unauthorized
   end
 end

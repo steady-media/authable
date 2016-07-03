@@ -1,9 +1,9 @@
-defmodule Authable.GrantTypes.RefreshTokenTest do
+defmodule Authable.GrantType.RefreshTokenTest do
   use ExUnit.Case
   use Authable.Rollbackable
   use Authable.RepoCase
   import Authable.Factory
-  alias Authable.GrantTypes.RefreshToken, as: RefreshTokenGrantType
+  alias Authable.GrantType.RefreshToken, as: RefreshTokenGrantType
 
   setup do
     resource_owner = insert(:user)
@@ -23,13 +23,13 @@ defmodule Authable.GrantTypes.RefreshTokenTest do
 
   test "can not insert access_token more than one with a token with same refresh_token params", %{params: params} do
     RefreshTokenGrantType.authorize(params)
-    access_token = RefreshTokenGrantType.authorize(params)
-    assert is_nil(access_token)
+    {:error, _, http_status} = RefreshTokenGrantType.authorize(params)
+    assert http_status == :unauthorized
   end
 
   test "fails if app is deleted by resource_owner", %{params: params, app: app} do
     @repo.delete!(app)
-
-    assert is_nil(RefreshTokenGrantType.authorize(params))
+    {:error, _, http_status} = RefreshTokenGrantType.authorize(params)
+    assert http_status == :unauthorized
   end
 end
