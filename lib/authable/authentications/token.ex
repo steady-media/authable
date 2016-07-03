@@ -19,7 +19,8 @@ defmodule Authable.Authentication.Token do
 
   It matches resource owner with given token name and value.
   If any resource owner matched given credentials,
-  it returns resource owner struct, otherwise {:error, Map, :http_status_code}.
+  it returns `Authable.Model.User` struct, otherwise
+  `{:error, Map, :http_status_code}`.
 
   ## Examples
 

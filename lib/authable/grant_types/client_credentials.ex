@@ -17,7 +17,7 @@ defmodule Authable.GrantType.ClientCredentials do
   For authorization, authorize function requires a map contains 'client_id' and
   'client_secret'. With valid credentials; it automatically creates
   access_token and refresh_token(if enabled via config) then it returns
-  access_token struct, otherwise {:error, Map, :http_status_code}.
+  `Authable.Model.Token` struct, otherwise `{:error, Map, :http_status_code}`.
 
   ## Examples
 

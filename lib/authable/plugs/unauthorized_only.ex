@@ -25,7 +25,7 @@ defmodule Authable.Plug.UnauthorizedOnly do
       end
   """
   def call(conn, _opts) do
-    response_conn_with(conn, Authable.Helper.authorize_for_resource(conn, ""))
+    response_conn_with(conn, Authable.Helper.authorize_for_resource(conn, []))
   end
 
   defp response_conn_with(conn, nil), do: conn

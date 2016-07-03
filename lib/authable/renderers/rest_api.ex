@@ -1,4 +1,9 @@
 defmodule Authable.Rederer.RestApi do
+  @moduledoc """
+  An implementation for `Authable.Rederer` to render Authable errors in RestAPI
+  format.
+  """
+
   import Plug.Conn
 
   def render(conn, map) do

@@ -13,18 +13,19 @@ defmodule Authable.AuthStrategy.Session do
   @doc """
   Finds resource owner using configured 'session' keys. Returns nil if
   either no keys are configured or key value not found in the session.
-  And, it returns resource_owner on sucess,
-  {:error, Map, :http_status_code} on fails.
+  And, it returns `Authable.Model.User` on sucess,
+  `{:error, Map, :http_status_code}` on fails.
   """
-  def authenticate(conn, _) do
-    if @session_auth, do: authenticate_via_session(conn, @session_auth)
+  def authenticate(conn, required_scopes) do
+    if @session_auth, do: authenticate_via_session(conn, @session_auth,
+      required_scopes)
   end
 
-  defp authenticate_via_session(conn, session_auth) do
+  defp authenticate_via_session(conn, session_auth, required_scopes) do
     Enum.find_value(session_auth, fn {key, module} ->
       session_value = conn |> fetch_session |> get_session(key)
       if !is_nil(session_value) do
-        module.authenticate(session_value, [])
+        module.authenticate(session_value, required_scopes)
       end
     end)
   end

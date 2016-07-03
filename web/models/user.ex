@@ -1,6 +1,6 @@
 defmodule Authable.Model.User do
   @moduledoc """
-  Oauth2 resource owner
+  OAuth2 resource owner
   """
 
   use Ecto.Schema

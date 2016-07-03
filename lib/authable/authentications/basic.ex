@@ -18,8 +18,8 @@ defmodule Authable.Authentication.Basic do
   requires identity and password, it does not require any scope check for
   authorization.
   If any resource owner matched given credentials,
-  it returns {:ok, resource owner struct}, otherwise
-  {:error, Map, :http_status_code}
+  it returns `{:ok, Authable.User.Model struct}`, otherwise
+  `{:error, Map, :http_status_code}`
 
   ## Examples
 
@@ -53,14 +53,14 @@ defmodule Authable.Authentication.Basic do
 
   defp authenticate_with_credentials(email, password) do
     case @repo.get_by(@resource_owner, email: email) do
+      nil ->
+        {:error, %{identity_not_found: "Identity not found."}, :unauthorized}
       user ->
         case match_with_user_password(password, user) do
           true -> {:ok, user}
           false -> {:error, %{wrong_password:
             "Identity, password combination is wrong."}, :unauthorized}
         end
-      nil ->
-        {:error, %{identity_not_found: "Identity not found."}, :unauthorized}
     end
   end
 

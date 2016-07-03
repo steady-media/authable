@@ -1,6 +1,6 @@
 defmodule Authable.Model.Token do
   @moduledoc """
-  Oauth2 token store
+  OAuth2 token store
   """
 
   use Ecto.Schema

@@ -20,7 +20,7 @@ defmodule Authable.GrantType.RefreshToken do
   'client_secret' and 'refresh_token'. With valid credentials;
   it automatically creates access_token and
   refresh_token(if enabled via config) then it returns
-  access_token struct, otherwise {:error, Map, :http_status_code}.
+  `Authable.Model.Token` struct, otherwise `{:error, Map, :http_status_code}`.
 
   ## Examples
 
@@ -115,7 +115,7 @@ defmodule Authable.GrantType.RefreshToken do
   end
 
   defp validate_client_match({:error, err, code}), do: {:error, err, code}
-  defp validate_client_match({:ok, token}, nil), do:
+  defp validate_client_match({:ok, _}, nil), do:
    {:error, %{invalid_client: "Client not found."}, :unauthorized}
   defp validate_client_match({:ok, token}, client) do
     if token.details["client_id"] != client.id do

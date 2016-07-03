@@ -20,7 +20,7 @@ defmodule Authable.GrantType.AuthorizationCode do
   'client_secret', 'redirect_uri'(must match with authorization code token's),
   and 'code' keys. With valid credentials; it automatically creates
   access_token and refresh_token(if enabled via config) then it returns
-  access_token struct, otherwise {:error, Map, :http_status_code}.
+  `Authable.Model.Token` struct, otherwise `{:error, Map, :http_status_code}`.
 
   ## Examples
 

@@ -13,8 +13,8 @@ defmodule Authable.AuthStrategy do
   Finds and returns Resource Owner(User) struct using a param(param can be any
   type).
 
-  This function returns a {:ok, ResourceOwner(User) struct} or
-  {:error, Map, :http_status_code} or nil.
+  This function returns a `{:ok, Authable.Model.User struct}` or
+  `{:error, Map, :http_status_code}` or nil.
   """
   @callback authenticate(any, List) :: {:ok, Application.get_env(:authable,
     :resource_owner)} | {:error, Map, Atom} | nil

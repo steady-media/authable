@@ -1,6 +1,6 @@
 defmodule Authable.Model.Client do
   @moduledoc """
-  Oauth2 client
+  OAuth2 client
   """
 
   use Ecto.Schema
