@@ -15,8 +15,8 @@ defmodule Authable.Authentication.Session do
   represents resource owners direct access to resources, it does not require
   any scope check for authorization.
   If any resource owner matched given credentials,
-  it returns {:ok, resource owner struct}, otherwise
-  {:error, Map, :http_status_code}
+  it returns `{:ok, Authable.Model.User struct}`, otherwise
+  `{:error, Map, :http_status_code}`
 
   ## Examples
 

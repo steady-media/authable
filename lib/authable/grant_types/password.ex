@@ -20,7 +20,7 @@ defmodule Authable.GrantType.Password do
   'password', 'scope' and 'client_id'. With valid credentials;
   it automatically creates access_token and
   refresh_token(if enabled via config) then it returns
-  access_token struct, otherwise {:error, Map, :http_status_code}.
+  `Authable.Model.Token` struct, otherwise `{:error, Map, :http_status_code}`.
 
   ## Examples
 
@@ -55,7 +55,7 @@ defmodule Authable.GrantType.Password do
 
   defp create_tokens(nil, _, _, _), do: {:error,
     %{invalid_client: "Invalid client id."}, :unauthorized}
-  defp create_tokens(client, nil, _, _), do: {:error,
+  defp create_tokens(_, nil, _, _), do: {:error,
     %{invalid_grant: "Identity not found."}, :bad_request}
   defp create_tokens(client, user, password, scopes) do
     {:ok, user}

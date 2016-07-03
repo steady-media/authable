@@ -13,8 +13,8 @@ defmodule Authable.AuthStrategy.Header do
   @doc """
   Finds resource owner using configured 'headers' keys. Returns nil if
   either no keys are configured or key value not found in the session.
-  And, it returns resource_owner on sucess,
-  {:error, Map, :http_status_code} on fails.
+  And, it returns `Authable.Model.User` on sucess,
+  `{:error, Map, :http_status_code}` on fails.
   """
   def authenticate(conn, required_scopes) do
     if @header_auth, do: authenticate(conn, @header_auth, required_scopes)
