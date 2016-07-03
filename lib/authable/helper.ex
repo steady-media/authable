@@ -12,7 +12,7 @@ defmodule Authable.Helper do
   Authenticate user by using configured authorization methods and scopes.
 
   ## Examples
-      required_scopes = "read"
+      required_scopes = ~w(read write)
       result = Authable.Plug.Authenticate.authorize_for_resource(conn,
         required_scopes)
       case result do

@@ -4,9 +4,6 @@ defmodule Authable.Plug.UnauthorizedOnly do
   """
 
   import Plug.Conn
-  alias Authable.AuthStrategy.Session, as: SessionAuthStrategy
-  alias Authable.AuthStrategy.QueryParam, as: QueryParamAuthStrategy
-  alias Authable.AuthStrategy.Header, as: HeaderAuthStrategy
 
   @behaviour Plug
   @rederer Application.get_env(:authable, :renderer)

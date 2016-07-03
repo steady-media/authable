@@ -5,9 +5,6 @@ defmodule Authable.Plug.Authenticate do
   """
 
   import Plug.Conn
-  alias Authable.AuthStrategy.Session, as: SessionAuthStrategy
-  alias Authable.AuthStrategy.QueryParam, as: QueryParamAuthStrategy
-  alias Authable.AuthStrategy.Header, as: HeaderAuthStrategy
 
   @behaviour Plug
   @rederer Application.get_env(:authable, :renderer)
@@ -31,7 +28,7 @@ defmodule Authable.Plug.Authenticate do
 
       defmodule SomeModule.AppController do
         use SomeModule.Web, :controller
-        plug Authable.Plug.Authenticate [scopes: "read, write"]
+        plug Authable.Plug.Authenticate, [scopes: ~w(read write)]
 
         def index(conn, _params) do
           # access to current user on successful authentication
@@ -43,7 +40,7 @@ defmodule Authable.Plug.Authenticate do
       defmodule SomeModule.AppController do
         use SomeModule.Web, :controller
 
-        plug Authable.Plug.Authenticate [scopes: "read, write"] when action in [:create]
+        plug Authable.Plug.Authenticate [scopes: ~w(read write)] when action in [:create]
 
         def index(conn, _params) do
           # anybody can call this action

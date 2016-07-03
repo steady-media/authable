@@ -107,7 +107,7 @@ Configure your application OAuth2 scopes on configuration. Then add `import Auth
 
         defmodule SomeModule.AppController do
           use SomeModule.Web, :controller
-          plug Authable.Plug.Authenticate [scopes: "read, write"]
+          plug Authable.Plug.Authenticate [scopes: ~w(read write)]
 
           def index(conn, _params) do
             # access to current user on successful authentication
@@ -119,7 +119,7 @@ Configure your application OAuth2 scopes on configuration. Then add `import Auth
         defmodule SomeModule.AppController do
           use SomeModule.Web, :controller
 
-          plug Authable.Plug.Authenticate [scopes: "read, write"] when action in [:create]
+          plug Authable.Plug.Authenticate [scopes: ~w(read write)] when action in [:create]
 
           def index(conn, _params) do
             # anybody can call this action

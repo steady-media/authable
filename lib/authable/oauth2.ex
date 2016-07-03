@@ -83,7 +83,7 @@ defmodule Authable.OAuth2 do
   end
 
   defp authorize_app(_, nil, _), do: {:error,
-   %{invalid_client: "Client not found"}, :unauthorized}
+   %{invalid_client: "Client not found"}, :unprocessable_entity}
   defp authorize_app(user, client, scope) do
     app = @repo.get_by(@app, user_id: user.id, client_id: client.id)
     authorize_app(user, client, app, scope)

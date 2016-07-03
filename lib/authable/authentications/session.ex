@@ -26,9 +26,9 @@ defmodule Authable.Authentication.Session do
       # it will return resource-owner.
       Authable.Authentication.Session.authenticate("st123456789", [])
   """
-  def authenticate(session_token, _required_scopes) do
+  def authenticate(session_token, required_scopes) do
     case TokenAuthentication.authenticate(
-      {"session_token", session_token}, []) do
+      {"session_token", session_token}, required_scopes) do
         {:ok, user} -> {:ok, user}
         {:error, errors, status} -> {:error,
           Map.put(errors, :headers, error_headers), status}
