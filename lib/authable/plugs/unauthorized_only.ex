@@ -32,8 +32,7 @@ defmodule Authable.Plug.UnauthorizedOnly do
   defp response_conn_with(conn, {:error, _, _}), do: conn
   defp response_conn_with(conn, _) do
     conn
-    |> put_status(:bad_request)
-    |> @rederer.render(%{errors: %{detail: "Only unauhorized access allowed!"}})
+    |> @rederer.render(:bad_request, %{errors: %{detail: "Only unauhorized access allowed!"}})
     |> halt
   end
 end

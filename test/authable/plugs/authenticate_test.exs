@@ -43,7 +43,7 @@ defmodule Authable.Plug.AuthenticateTest do
     insert(:session_token, user_id: user.id)
     conn = conn |> sign_conn
     conn = AuthenticatePlug.call(conn, @opts)
-    assert conn.state == :sent
+    assert conn.state == :set
     assert conn.status == 403
     assert is_nil(conn.assigns[:current_user])
   end

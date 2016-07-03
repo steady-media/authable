@@ -12,5 +12,5 @@ defmodule Authable.Renderer do
   @doc """
   Puts response body inside Plug.Conn and returns Plug.Conn
   """
-  @callback render(Plug.Conn, Map) :: Plug.Conn
+  @callback render(Plug.Conn, Atom, Map) :: Plug.Conn
 end
