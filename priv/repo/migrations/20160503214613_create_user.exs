@@ -7,6 +7,7 @@ defmodule Authable.Repo.Migrations.CreateUser do
       add :email, :string
       add :password, :string
       add :settings, :jsonb
+      add :priv_settings, :jsonb
 
       timestamps
     end
