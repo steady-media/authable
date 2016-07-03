@@ -66,7 +66,7 @@ defmodule Authable.OAuth2Test do
                "scope" => @scopes}
     {:error, _, http_status_code} = OAuth2.authorize_app(resource_owner,
       params)
-    assert http_status_code == :unauthorized
+    assert http_status_code == :unprocessable_entity
   end
 
   test "deletes app and user's all client tokens" do

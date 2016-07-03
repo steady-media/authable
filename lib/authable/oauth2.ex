@@ -3,7 +3,7 @@ defmodule Authable.OAuth2 do
   OAut2 authorization strategy router
   """
 
-  import Ecto.Query, only: [where: 2, where: 3, from: 2]
+  import Ecto.Query, only: [from: 2]
 
   @repo Application.get_env(:authable, :repo)
   @token_store Application.get_env(:authable, :token_store)
