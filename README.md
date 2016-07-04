@@ -59,7 +59,7 @@ The package can be installed as:
             }
           },
           scopes: ~w(read write session),
-          renderer: Authable.Rederer.RestApi
+          renderer: Authable.Renderer.RestApi
 
   If you want to disable a grant type then delete from grant types config.
 

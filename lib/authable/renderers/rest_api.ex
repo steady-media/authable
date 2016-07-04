@@ -1,4 +1,4 @@
-defmodule Authable.Rederer.RestApi do
+defmodule Authable.Renderer.RestApi do
   @moduledoc """
   An implementation for `Authable.Rederer` to render Authable errors in RestAPI
   format.
