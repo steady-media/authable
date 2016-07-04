@@ -11,7 +11,7 @@ The package can be installed as:
   Only for ecto versions > 2.0
 
         def deps do
-          [{:authable, "~> 0.6.0"}]
+          [{:authable, "~> 0.6.1"}]
         end
 
   2. Ensure authable is started before your application:
