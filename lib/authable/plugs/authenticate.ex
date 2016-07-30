@@ -7,7 +7,7 @@ defmodule Authable.Plug.Authenticate do
   import Plug.Conn
 
   @behaviour Plug
-  @rederer Application.get_env(:authable, :renderer)
+  @renderer Application.get_env(:authable, :renderer)
 
   def init(opts) do
     Keyword.get opts, :scopes, ""
@@ -62,7 +62,7 @@ defmodule Authable.Plug.Authenticate do
   defp response_conn_with(conn, nil) do
     conn
     |> put_resp_header("www-authenticate", "Bearer realm=\"authable\"")
-    |> @rederer.render(:forbidden, %{errors: %{detail: "Resource access requires authentication!"}})
+    |> @renderer.render(:forbidden, %{errors: %{detail: "Resource access requires authentication!"}})
     |> halt
   end
   defp response_conn_with(conn, {:error, errors, http_status_code}) do
@@ -70,7 +70,7 @@ defmodule Authable.Plug.Authenticate do
     errors = %{errors: Map.delete(errors, :headers)}
     conn
     |> put_resp_header("www-authenticate", header_val)
-    |> @rederer.render(http_status_code, %{errors: errors})
+    |> @renderer.render(http_status_code, %{errors: errors})
     |> halt
   end
   defp response_conn_with(conn, {:ok, current_user}), do: assign(conn,
