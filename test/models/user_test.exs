@@ -46,4 +46,18 @@ defmodule Authable.Model.UserTest do
     )
     assert changeset.valid?
   end
+
+  test "password_changeset with valid attributes" do
+    changeset = @resource_owner.password_changeset(
+      %@resource_owner{}, %{password: "1A2bCx.y"}
+    )
+    assert changeset.valid?
+  end
+
+  test "password_changeset, password too short" do
+    changeset = @resource_owner.password_changeset(
+      %@resource_owner{}, %{password: "1A23567"}
+    )
+    refute changeset.valid?
+  end
 end

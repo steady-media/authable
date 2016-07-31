@@ -56,6 +56,13 @@ defmodule Authable.Model.User do
     |> put_password_hash
   end
 
+  def password_changeset(model, params) do
+    model
+    |> cast(params, ~w(password), [])
+    |> validate_length(:password, min: 8, max: 32)
+    |> put_password_hash
+  end
+
   defp put_password_hash(model_changeset) do
     case model_changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
