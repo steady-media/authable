@@ -54,6 +54,7 @@ defmodule Authable.Model.User do
     |> cast(params, ~w(password), [])
     |> validate_length(:password, min: 8, max: 32)
     |> put_password_hash
+    |> put_unconfirmed_flag
   end
 
   def password_changeset(model, params) do
@@ -72,4 +73,13 @@ defmodule Authable.Model.User do
     end
   end
 
+  defp put_unconfirmed_flag(model_changeset) do
+    case model_changeset do
+      %Ecto.Changeset{valid?: true, changes: %{settings: user_settings}} ->
+        put_change(model_changeset, :settings, Map.put(user_settings,
+          :confirmed, false))
+      _ ->
+        model_changeset
+    end
+  end
 end

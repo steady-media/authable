@@ -1,7 +1,7 @@
 defmodule Authable.Model.UserTest do
   use Authable.ModelCase
 
-  @valid_attrs %{email: "foo@example.com", password: "s3cr3tX.", settings: %{}}
+  @valid_attrs %{email: "foo@example.com", password: "s3cr3tX.", settings: %{locale: "en"}}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
@@ -31,6 +31,7 @@ defmodule Authable.Model.UserTest do
   test "registration_changeset, encrypt password" do
     changeset = @resource_owner.registration_changeset(%@resource_owner{}, @valid_attrs)
     assert changeset.changes.password
+    assert changeset.changes.settings
   end
 
   test "registration_changeset, password too short" do
