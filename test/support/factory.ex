@@ -34,7 +34,7 @@ defmodule Authable.Factory do
     %@token_store{
       name: "session_token",
       value: sequence(:value, &"st#{&1}"),
-      expires_at: Timex.Time.now(:seconds) + 3600,
+      expires_at: :os.system_time(:seconds) + 3600,
       details: %{scope: "session,read,write"}
     }
   end
@@ -43,7 +43,7 @@ defmodule Authable.Factory do
     %@token_store{
       name: "access_token",
       value: sequence(:value, &"at#{&1}"),
-      expires_at: Timex.Time.now(:seconds) + 3600,
+      expires_at: :os.system_time(:seconds) + 3600,
       details: %{
         scope: "read",
         grant_type: "authorization_code",
@@ -55,7 +55,7 @@ defmodule Authable.Factory do
     %@token_store{
       name: "refresh_token",
       value: sequence(:value, &"rt#{&1}"),
-      expires_at: Timex.Time.now(:seconds) + 3600,
+      expires_at: :os.system_time(:seconds) + 3600,
       details: %{
         grant_type: "authorization_code",
         scope: "read"
@@ -67,7 +67,7 @@ defmodule Authable.Factory do
     %@token_store{
       name: "authorization_code",
       value: sequence(:value, &"ac#{&1}"),
-      expires_at: Timex.Time.now(:seconds) + 900,
+      expires_at: :os.system_time(:seconds) + 900,
       details: %{
         scope: "read",
         grant_type: "password",

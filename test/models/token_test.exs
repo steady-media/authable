@@ -47,7 +47,7 @@ defmodule Authable.Model.TokenTest do
   end
 
   test "is_expired true", %{user: user} do
-    token = insert(:refresh_token, user_id: user.id, expires_at: (Timex.Time.now(:seconds) - 1))
+    token = insert(:refresh_token, user_id: user.id, expires_at: (:os.system_time(:seconds) - 1))
     assert @token_store.is_expired?(token)
   end
 

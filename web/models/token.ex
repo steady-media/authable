@@ -5,7 +5,6 @@ defmodule Authable.Model.Token do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Timex.Time
   alias Authable.Utils.Crypt, as: CryptUtil
 
   @resource_owner Application.get_env(:authable, :resource_owner)
@@ -44,21 +43,21 @@ defmodule Authable.Model.Token do
     model
     |> changeset(params)
     |> put_token_name("authorization_code")
-    |> put_expires_at(Time.now(:seconds) + @expires_in[:authorization_code])
+    |> put_expires_at(:os.system_time(:seconds) + @expires_in[:authorization_code])
   end
 
   def refresh_token_changeset(model, params \\ :empty) do
     model
     |> changeset(params)
     |> put_token_name("refresh_token")
-    |> put_expires_at(Time.now(:seconds) + @expires_in[:refresh_token])
+    |> put_expires_at(:os.system_time(:seconds) + @expires_in[:refresh_token])
   end
 
   def access_token_changeset(model, params \\ :empty) do
     model
     |> changeset(params)
     |> put_token_name("access_token")
-    |> put_expires_at(Time.now(:seconds) + @expires_in[:access_token])
+    |> put_expires_at(:os.system_time(:seconds) + @expires_in[:access_token])
   end
 
   def session_token_changeset(model, params \\ :empty) do
@@ -66,11 +65,11 @@ defmodule Authable.Model.Token do
     |> changeset(params)
     |> put_token_name("session_token")
     |> put_app_scopes
-    |> put_expires_at(Time.now(:seconds) + @expires_in[:session_token])
+    |> put_expires_at(:os.system_time(:seconds) + @expires_in[:session_token])
   end
 
   def is_expired?(token) do
-    token.expires_at < Time.now(:seconds)
+    token.expires_at < :os.system_time(:seconds)
   end
 
   defp put_token_value(model_changeset) do

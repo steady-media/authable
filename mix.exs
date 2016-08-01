@@ -21,7 +21,7 @@ defmodule Authable.Mixfile do
   def application do
     [
       mod: {Authable, []},
-      applications: [:logger, :comeonin, :ecto, :postgrex, :timex,
+      applications: [:logger, :comeonin, :ecto, :postgrex,
         :secure_random]
     ]
   end
@@ -40,7 +40,6 @@ defmodule Authable.Mixfile do
       {:postgrex, "~> 0.11"},
       {:ecto, "~> 2.0"},
       {:comeonin, "~> 2.5"},
-      {:timex, "~> 2.2"},
       {:secure_random, "~> 0.3"},
       {:plug, "~> 1.1"},
       {:poison, "~> 2.2"},
