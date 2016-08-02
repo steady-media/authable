@@ -32,7 +32,7 @@ defmodule Authable.Plug.UnauthorizedOnly do
   defp response_conn_with(conn, {:error, _, _}), do: conn
   defp response_conn_with(conn, _) do
     conn
-    |> @renderer.render(:bad_request, %{errors: %{detail: "Only unauhorized access allowed!"}})
+    |> @renderer.render(:bad_request, %{errors: %{details: "Only unauhorized access allowed!"}})
     |> halt
   end
 end

@@ -62,7 +62,7 @@ defmodule Authable.Plug.Authenticate do
   defp response_conn_with(conn, nil) do
     conn
     |> put_resp_header("www-authenticate", "Bearer realm=\"authable\"")
-    |> @renderer.render(:forbidden, %{errors: %{detail: "Resource access requires authentication!"}})
+    |> @renderer.render(:forbidden, %{errors: %{details: "Resource access requires authentication!"}})
     |> halt
   end
   defp response_conn_with(conn, {:error, errors, http_status_code}) do
