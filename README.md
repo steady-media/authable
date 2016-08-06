@@ -10,56 +10,62 @@ The package can be installed as:
 
   Only for ecto versions > 2.0
 
-        def deps do
-          [{:authable, "~> 0.6.3"}]
-        end
+    ```elixir
+    def deps do
+      [{:authable, "~> 0.6.3"}]
+    end
+    ```
 
   2. Ensure authable is started before your application:
 
-        def application do
-          [applications: [:authable]]
-        end
+    ```elixir
+    def application do
+      [applications: [:authable]]
+    end
+    ```
 
   3. Add authable configurations to your `config/config.exs` file:
 
-        config :authable,
-          ecto_repos: [Authable.Repo],
-          repo: Authable.Repo,
-          resource_owner: Authable.Model.User,
-          token_store: Authable.Model.Token,
-          client: Authable.Model.Client,
-          app: Authable.Model.App,
-          expires_in: %{
-            access_token: 3600,
-            refresh_token: 24 * 3600,
-            authorization_code: 300,
-            session_token: 30 * 24 * 3600
-          },
-          grant_types: %{
-            authorization_code: Authable.GrantType.AuthorizationCode,
-            client_credentials: Authable.GrantType.ClientCredentials,
-            password: Authable.GrantType.Password,
-            refresh_token: Authable.GrantType.RefreshToken
-          },
-          auth_strategies: %{
-            headers: %{
-              "authorization" => [
-                {~r/Basic ([a-zA-Z\-_\+=]+)/, Authable.Authentication.Basic},
-                {~r/Bearer ([a-zA-Z\-_\+=]+)/, Authable.Authentication.Bearer},
-              ],
-              "x-api-token" => [
-                {~r/([a-zA-Z\-_\+=]+)/, Authable.Authentication.Bearer}
-              ]
-            },
-            query_params: %{
-              "access_token" => Authable.Authentication.Bearer
-            },
-            sessions: %{
-              "session_token" => Authable.Authentication.Session
-            }
-          },
-          scopes: ~w(read write session),
-          renderer: Authable.Renderer.RestApi
+    ```elixir
+    config :authable,
+      ecto_repos: [Authable.Repo],
+      repo: Authable.Repo,
+      resource_owner: Authable.Model.User,
+      token_store: Authable.Model.Token,
+      client: Authable.Model.Client,
+      app: Authable.Model.App,
+      expires_in: %{
+        access_token: 3600,
+        refresh_token: 24 * 3600,
+        authorization_code: 300,
+        session_token: 30 * 24 * 3600
+      },
+      grant_types: %{
+        authorization_code: Authable.GrantType.AuthorizationCode,
+        client_credentials: Authable.GrantType.ClientCredentials,
+        password: Authable.GrantType.Password,
+        refresh_token: Authable.GrantType.RefreshToken
+      },
+      auth_strategies: %{
+        headers: %{
+          "authorization" => [
+            {~r/Basic ([a-zA-Z\-_\+=]+)/, Authable.Authentication.Basic},
+            {~r/Bearer ([a-zA-Z\-_\+=]+)/, Authable.Authentication.Bearer},
+          ],
+          "x-api-token" => [
+            {~r/([a-zA-Z\-_\+=]+)/, Authable.Authentication.Bearer}
+          ]
+        },
+        query_params: %{
+          "access_token" => Authable.Authentication.Bearer
+        },
+        sessions: %{
+          "session_token" => Authable.Authentication.Session
+        }
+      },
+      scopes: ~w(read write session),
+      renderer: Authable.Renderer.RestApi
+    ```
 
   If you want to disable a grant type then delete from grant types config.
 
@@ -67,17 +73,21 @@ The package can be installed as:
 
   4. Add database configurations for the `Authable.Repo` on env config files:
 
-        config :authable, Authable.Repo,
-          adapter: Ecto.Adapters.Postgres,
-          username: "",
-          password: "",
-          database: "",
-          hostname: "",
-          pool_size: 10
+    ```elixir
+    config :authable, Authable.Repo,
+      adapter: Ecto.Adapters.Postgres,
+      username: "",
+      password: "",
+      database: "",
+      hostname: "",
+      pool_size: 10
+    ```
 
   5. Run migrations for Authable.Repo (Note: all id fields are UUID type):
 
-        mix ecto.migrate -r Authable.Repo
+    ```elixir
+    mix ecto.migrate -r Authable.Repo
+    ```
 
   6. You are ready to go!
 
@@ -105,43 +115,45 @@ Reads headers for configured `headers` keys and passes to the matched authentica
 
 Configure your application OAuth2 scopes on configuration. Then add `import Authable.Plug.Authenticate` with scopes into your controller.
 
-        defmodule SomeModule.AppController do
-          use SomeModule.Web, :controller
-          plug Authable.Plug.Authenticate [scopes: ~w(read write)]
+```elixir
+defmodule SomeModule.AppController do
+  use SomeModule.Web, :controller
+  plug Authable.Plug.Authenticate [scopes: ~w(read write)]
 
-          def index(conn, _params) do
-            # access to current user on successful authentication
-            current_user = conn.assigns[:current_user]
-            ...
-          end
-        end
+  def index(conn, _params) do
+    # access to current user on successful authentication
+    current_user = conn.assigns[:current_user]
+    ...
+  end
+end
 
-        defmodule SomeModule.AppController do
-          use SomeModule.Web, :controller
+defmodule SomeModule.AppController do
+  use SomeModule.Web, :controller
 
-          plug Authable.Plug.Authenticate [scopes: ~w(read write)] when action in [:create]
+  plug Authable.Plug.Authenticate [scopes: ~w(read write)] when action in [:create]
 
-          def index(conn, _params) do
-            # anybody can call this action
-            ...
-          end
+  def index(conn, _params) do
+    # anybody can call this action
+    ...
+  end
 
-          def create(conn, _params) do
-            # only logged in users can access this action
-            current_user = conn.assigns[:current_user]
-            ...
-          end
-        end
+  def create(conn, _params) do
+    # only logged in users can access this action
+    current_user = conn.assigns[:current_user]
+    ...
+  end
+end
 
-        # if you need to allow a resource only unauthorized then
-        defmodule SomeModule.AppController do
-          use SomeModule.Web, :controller
-          plug Authable.Plug.UnauthorizedOnly when action in [:register]
+# if you need to allow a resource only unauthorized then
+defmodule SomeModule.AppController do
+  use SomeModule.Web, :controller
+  plug Authable.Plug.UnauthorizedOnly when action in [:register]
 
-          def register(conn, _params) do
-            # only not logged in user can access this action
-          end
-        end
+  def register(conn, _params) do
+    # only not logged in user can access this action
+  end
+end
+```
 
 On failure of authentication, authable renders as a RestApi json format, if you need to change the format file you need to implement the behaviour of `Authable.Renderer` and then change the `renderer` configuration.
 
@@ -153,43 +165,45 @@ Currently, authable library supports by default `authorization code`, `client cr
 
 To authorize a client for resources, all you need to do is calling `OAuth2.authorize` method with necessary params, on successful authorization `Authable.Model.Token` struct will return, on failure `{:error, errors, http_status_code}`.
 
-        # For authorization_code grant type
-        Authable.OAuth2.authorize(%{
-          "grant_type" => "authorization_code",
-          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
-          "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
-          "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
-          "code" => "W_hb8JEDmeYChsNfOGCmbQ",
-          "scope" => "read" # optional
-        %})
+```elixir
+# For authorization_code grant type
+Authable.OAuth2.authorize(%{
+  "grant_type" => "authorization_code",
+  "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+  "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+  "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
+  "code" => "W_hb8JEDmeYChsNfOGCmbQ",
+  "scope" => "read" # optional
+%})
 
-        # For client_credentials grant type
-        Authable.OAuth2.authorize(%{
-          "grant_type" => "client_credentials",
-          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
-          "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
-          "scope" => "read" # optional
-        %})
+# For client_credentials grant type
+Authable.OAuth2.authorize(%{
+  "grant_type" => "client_credentials",
+  "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+  "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+  "scope" => "read" # optional
+%})
 
-        # For password grant type
-        Authable.OAuth2.authorize(%{
-          "grant_type" => "password",
-          "email" => "foo@example.com",
-          "password" => "12345678",
-          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
-          "scope" => "read" # optional
-        %})
+# For password grant type
+Authable.OAuth2.authorize(%{
+  "grant_type" => "password",
+  "email" => "foo@example.com",
+  "password" => "12345678",
+  "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+  "scope" => "read" # optional
+%})
 
-        # For refresh_token grant type
-        Authable.OAuth2.authorize(%{
-          "grant_type" => "refresh_token",
-          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
-          "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
-          "refresh_token" => "XJaVz3lCFC9IfifBriA-dw",
-          "scope" => "read" # optional
-        %})
+# For refresh_token grant type
+Authable.OAuth2.authorize(%{
+  "grant_type" => "refresh_token",
+  "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+  "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
+  "refresh_token" => "XJaVz3lCFC9IfifBriA-dw",
+  "scope" => "read" # optional
+%})
 
-        # You may adjust token expiration durations from configuration.
+# You can adjust token expiration durations from configuration.
+```
 
 ### How a 'OAuth2 Resource Owner' can authorize clients?
 
@@ -197,11 +211,13 @@ Authorizing client may mean installing client or giving permission to a client t
 
 #### Examples
 
-        Authable.OAuth2.authorize_app(user, %{
-          "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
-          "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
-          "scope" => "read,write"
-        %})
+```elixir
+Authable.OAuth2.authorize_app(user, %{
+  "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
+  "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
+  "scope" => "read,write"
+%})
+```
 
 ### Changing models
 
@@ -215,7 +231,9 @@ To change models, you have two options:
 
 To run tests, jump into authable directory and run the command:
 
-    mix test
+```shell
+mix test
+```
 
 ## Contributing
 
