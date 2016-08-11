@@ -3,7 +3,7 @@ defmodule Authable.Mixfile do
 
   def project do
     [app: :authable,
-     version: "0.6.3",
+     version: "0.6.4",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
