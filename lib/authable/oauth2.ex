@@ -98,8 +98,8 @@ defmodule Authable.OAuth2 do
   defp authorize_app(_, _, app, scope) do
     if app.scope != scope do
       scope = scope
-      |> String.split(",", trim: true)
-      |> Enum.concat(String.split(app.scope, ",", trim: true))
+      |> Authable.Utils.String.comma_split
+      |> Enum.concat(Authable.Utils.String.comma_split(app.scope))
       |> Enum.uniq()
       scope = @scopes -- (@scopes -- scope)
       @repo.update!(@app.changeset(app, %{scope: Enum.join(scope, ",")}))

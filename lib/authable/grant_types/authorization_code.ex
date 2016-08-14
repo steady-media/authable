@@ -101,8 +101,8 @@ defmodule Authable.GrantType.AuthorizationCode do
   defp validate_token_scope({:error, err, code}, _), do: {:error, err, code}
   defp validate_token_scope({:ok, token}, ""), do: {:ok, token}
   defp validate_token_scope({:ok, token}, required_scopes) do
-    required_scopes = required_scopes |> String.split(",", trim: true)
-    scopes = String.split(token.details["scope"], ",", trim: true)
+    required_scopes = required_scopes |> Authable.Utils.String.comma_split
+    scopes = Authable.Utils.String.comma_split(token.details["scope"])
     if Enum.find(required_scopes, fn(required_scope) ->
         Enum.member?(scopes, required_scope) == false end) do
       {:error, %{invalid_scope:

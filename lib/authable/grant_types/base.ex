@@ -84,7 +84,7 @@ defmodule Authable.GrantType.Base do
 
   defp scopes_check(scopes) do
     valid_scopes = Application.get_env(:authable, :scopes)
-    desired_scopes = String.split(scopes, ",", trim: true)
+    desired_scopes = Authable.Utils.String.comma_split(scopes)
     Enum.each(desired_scopes, fn(scope) -> scope_check(valid_scopes, scope) end)
   end
 

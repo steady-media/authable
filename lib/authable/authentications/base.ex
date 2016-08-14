@@ -24,7 +24,7 @@ defmodule Authable.Authentication.Base do
         => {:ok, true}
   """
   def is_authorized?(required_scopes, scopes) do
-    scopes = String.split(scopes, ",", trim: true)
+    scopes = Authable.Utils.String.comma_split(scopes)
     if Enum.find(required_scopes, fn(required_scope) ->
         Enum.member?(scopes, required_scope) == false end) do
       {:error, %{insufficient_scope:
