@@ -1,6 +1,7 @@
 defmodule Authable.Authentication.Error do
   @moduledoc false
 
+  @doc false
   def invalid_request(msg),
     do: {:error, %{invalid_request: msg}, :bad_request}
 
