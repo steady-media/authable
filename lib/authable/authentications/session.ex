@@ -35,5 +35,6 @@ defmodule Authable.Authentication.Session do
     end
   end
 
-  defp error_headers, do: [%{"www-authenticate" => "Cookie realm=\"authable\""}]
+  defp error_headers,
+    do: [%{"www-authenticate" => "Cookie realm=\"authable\""}]
 end

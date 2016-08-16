@@ -28,12 +28,10 @@ defmodule Authable.Authentication.Bearer do
       Authable.Authentication.Bearer.authenticate("Bearer at123456789",
         ["read"])
   """
-  def authenticate(%{"access_token" => access_token}, required_scopes) do
-    authenticate(access_token, required_scopes)
-  end
-
-  def authenticate("Bearer " <> access_token, required_scopes), do:
-    authenticate(access_token, required_scopes)
+  def authenticate(%{"access_token" => access_token}, required_scopes),
+    do: authenticate(access_token, required_scopes)
+  def authenticate("Bearer " <> access_token, required_scopes),
+    do: authenticate(access_token, required_scopes)
   def authenticate(access_token, required_scopes) do
     case TokenAuthentication.authenticate(
       {"access_token", access_token}, required_scopes) do

@@ -257,6 +257,8 @@ Authable is an extensible module, you can create your strategy and share as hex 
 
 https://tools.ietf.org/html/rfc6749
 
+https://tools.ietf.org/html/rfc6750
+
 ## Badges
 
 [![Build Status](https://travis-ci.org/mustafaturan/authable.svg?branch=master)](https://travis-ci.org/mustafaturan/authable)

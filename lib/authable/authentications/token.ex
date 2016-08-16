@@ -6,13 +6,12 @@ defmodule Authable.Authentication.Token do
   'token store(Authable.Token)'.
   """
 
-  import Authable.Authentication.Base
+  alias Authable.Authentication.Error, as: AuthenticationError
 
   @behaviour Authable.Authentication
   @repo Application.get_env(:authable, :repo)
   @resource_owner Application.get_env(:authable, :resource_owner)
   @token_store Application.get_env(:authable, :token_store)
-
 
   @doc """
   Authenticates resource-owner using given token name and value pairs.
@@ -38,27 +37,25 @@ defmodule Authable.Authentication.Token do
     )
   end
 
-  defp token_check(nil, _), do: {:error, %{invalid_token: "Token not found."},
-    :unauthorized}
+  defp token_check(nil, _),
+    do: AuthenticationError.invalid_token("Token not found.")
   defp token_check(token, required_scopes) do
     if @token_store.is_expired?(token) do
-      {:error, %{invalid_token: "Token expired."}, :unauthorized}
+      AuthenticationError.invalid_token("Token expired.")
     else
-      case is_authorized?(required_scopes, token.details["scope"]) do
-        {:ok, true} ->
-          resource_owner_check(
-            @repo.get(@resource_owner, token.user_id)
-          )
-        {:error, errors} -> {:error, errors, :forbidden}
+      scopes = Authable.Utils.String.comma_split(token.details["scope"])
+      if Authable.Utils.List.subset?(scopes, required_scopes) do
+        resource_owner_check(
+          @repo.get(@resource_owner, token.user_id)
+        )
+      else
+        AuthenticationError.insufficient_scope(required_scopes)
       end
     end
   end
 
-  defp resource_owner_check(nil) do
-    {:error, %{invalid_token: "User not found."}, :unauthorized}
-  end
-
-  defp resource_owner_check(resource_owner) do
-    {:ok, resource_owner}
-  end
+  defp resource_owner_check(nil),
+    do: AuthenticationError.invalid_token("User not found.")
+  defp resource_owner_check(resource_owner),
+    do: {:ok, resource_owner}
 end

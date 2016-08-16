@@ -34,9 +34,8 @@ defmodule Authable.Authentication.Basic do
       Authable.Authentication.Basic.authenticate(
         "Basic Zm9vQGV4YW1wbGUuY29tOjEyMzQ1Njc4", [])
   """
-  def authenticate(auth_credentials, _required_scopes) do
-    authenticate_with_credentials(auth_credentials)
-  end
+  def authenticate(auth_credentials, _required_scopes),
+    do: authenticate_with_credentials(auth_credentials)
 
   defp authenticate_with_credentials("Basic " <> auth_credentials), do:
     authenticate_with_credentials(auth_credentials)
@@ -45,28 +44,29 @@ defmodule Authable.Authentication.Basic do
       {:ok, credentials} ->
         [email, password] = String.split(credentials, ":")
         authenticate_with_credentials(email, password)
-      :error -> {:error, %{invalid_hash: "Invalid credentials encoding.",
+      :error -> {:error, %{invalid_request: "Invalid credentials encoding.",
         headers: error_headers},
-        :unauthorized}
+        :bad_request}
     end
   end
-
   defp authenticate_with_credentials(email, password) do
     case @repo.get_by(@resource_owner, email: email) do
       nil ->
-        {:error, %{identity_not_found: "Identity not found."}, :unauthorized}
+        {:error, %{invalid_credentials: "Identity not found.", headers:
+          error_headers}, :unauthorized}
       user ->
         case match_with_user_password(password, user) do
           true -> {:ok, user}
-          false -> {:error, %{wrong_password:
-            "Identity, password combination is wrong."}, :unauthorized}
+          false -> {:error, %{invalid_credentials:
+            "Identity, password combination is wrong.",
+            headers: error_headers}, :unauthorized}
         end
     end
   end
 
-  defp match_with_user_password(password, user) do
-    CryptUtil.match_password(password, Map.get(user, :password, ""))
-  end
+  defp match_with_user_password(password, user),
+    do: CryptUtil.match_password(password, Map.get(user, :password, ""))
 
-  defp error_headers, do: [%{"www-authenticate" => "Basic realm=\"authable\""}]
+  defp error_headers,
+    do: [%{"www-authenticate" => "Basic realm=\"authable\""}]
 end
