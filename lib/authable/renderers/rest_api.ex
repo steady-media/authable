@@ -15,7 +15,7 @@ defmodule Authable.Renderer.RestApi do
   end
 
   defp merge_error_keys(%{errors: errors}) do
-    %{ errors: Enum.reduce(errors, %{}, fn({key, val}, acc) ->
+    %{errors: Enum.reduce(errors, %{}, fn({key, val}, acc) ->
       Map.update(acc, key, [val], &[val|&1])
     end)}
   end
