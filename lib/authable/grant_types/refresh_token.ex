@@ -4,6 +4,7 @@ defmodule Authable.GrantType.RefreshToken do
   """
 
   import Authable.GrantType.Base
+  alias Authable.GrantType.Error, as: GrantTypeError
 
   @behaviour Authable.GrantType
   @repo Application.get_env(:authable, :repo)
@@ -50,12 +51,13 @@ defmodule Authable.GrantType.RefreshToken do
       (if token, do: token.details["scope"], else: ""))
   end
 
-  def authorize(_), do: {:error,
-    %{invalid_request: "Request must include at least client_id, client_secret and refresh_token parameters."},
-    :bad_request}
+  def authorize(_) do
+    GrantTypeError.invalid_request("Request must include at least client_id,
+      client_secret and refresh_token parameters.")
+  end
 
-  defp create_tokens(nil, _, _), do:
-    {:error, %{invalid_token: "Token not found."}, :unauthorized}
+  defp create_tokens(nil, _, _),
+    do: GrantTypeError.invalid_grant("Token not found or expired.")
   defp create_tokens(token, client, required_scopes) do
     {:ok, token}
     |> validate_client_match(client)
@@ -66,60 +68,63 @@ defmodule Authable.GrantType.RefreshToken do
     |> create_oauth2_tokens(required_scopes)
   end
 
-  defp create_oauth2_tokens({:error, err, code}, _), do: {:error, err, code}
+  defp create_oauth2_tokens({:error, err, code}, _),
+    do: {:error, err, code}
   defp create_oauth2_tokens({:ok, token}, required_scopes) do
     create_oauth2_tokens(
       token.user_id, grant_type, token.details["client_id"],
       required_scopes, token.details["redirect_uri"])
   end
 
-  defp delete_token({:error, err, code}), do: {:error, err, code}
+  defp delete_token({:error, err, code}),
+    do: {:error, err, code}
   defp delete_token({:ok, token}) do
     @repo.delete!(token)
     {:ok, token}
   end
 
-  defp validate_token_scope({:error, err, code}, _), do: {:error, err, code}
-  defp validate_token_scope({:ok, token}, ""), do: {:ok, token}
+  defp validate_token_scope({:error, err, code}, _),
+    do: {:error, err, code}
+  defp validate_token_scope({:ok, token}, ""),
+    do: {:ok, token}
   defp validate_token_scope({:ok, token}, required_scopes) do
-    required_scopes = required_scopes |> Authable.Utils.String.comma_split
+    required_scopes = Authable.Utils.String.comma_split(required_scopes)
     scopes = Authable.Utils.String.comma_split(token.details["scope"])
-    if Enum.find(required_scopes, fn(required_scope) ->
-        Enum.member?(scopes, required_scope) == false end) do
-      {:error, %{invalid_scope:
-        "Allowed scopes for the token are #{Enum.join(scopes, ", ")}."},
-        :bad_request}
-    else
+    if Authable.Utils.List.subset?(scopes, required_scopes) do
       {:ok, token}
+    else
+      GrantTypeError.invalid_scope(scopes)
     end
   end
 
-  defp validate_token_expiration({:error, err, code}), do: {:error, err, code}
+  defp validate_token_expiration({:error, err, code}),
+    do: {:error, err, code}
   defp validate_token_expiration({:ok, token}) do
     if @token_store.is_expired?(token) do
-      {:error, %{invalid_token: "Token expired."}, :unauthorized}
+      GrantTypeError.invalid_grant("Token expired.")
     else
       {:ok, token}
     end
   end
 
-  defp validate_app_authorization({:error, err, code}), do: {:error, err,
-    code}
+  defp validate_app_authorization({:error, err, code}),
+    do: {:error, err, code}
   defp validate_app_authorization({:ok, token}) do
     if app_authorized?(token.user_id, token.details["client_id"]) do
       {:ok, token}
     else
-      {:error, %{access_revoke: "Resource owner revoked access for client."},
-        :unauthorized}
+      GrantTypeError.access_denied(
+        "Resource owner revoked access for the client.")
     end
   end
 
-  defp validate_client_match({:error, err, code}), do: {:error, err, code}
-  defp validate_client_match({:ok, _}, nil), do:
-   {:error, %{invalid_client: "Client not found."}, :unauthorized}
+  defp validate_client_match({:error, err, code}),
+    do: {:error, err, code}
+  defp validate_client_match({:ok, _}, nil),
+    do: GrantTypeError.invalid_client("Client not found.")
   defp validate_client_match({:ok, token}, client) do
     if token.details["client_id"] != client.id do
-      {:error, %{invalid_grant: "Token not found."}, :unauthorized}
+      GrantTypeError.invalid_grant("Token not found.")
     else
       {:ok, token}
     end

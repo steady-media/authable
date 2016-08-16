@@ -4,6 +4,7 @@ defmodule Authable.GrantType.Password do
   """
 
   import Authable.GrantType.Base
+  alias Authable.GrantType.Error, as: GrantTypeError
   alias Authable.Utils.Crypt, as: CryptUtil
 
   @behaviour Authable.GrantType
@@ -42,21 +43,20 @@ defmodule Authable.GrantType.Password do
     user = @repo.get_by(@resource_owner, email: email)
     create_tokens(client, user, password, scopes)
   end
-
   def authorize(%{"email" => email, "password" => password, "client_id" => client_id}) do
     client = @repo.get(@client, client_id)
     user = @repo.get_by(@resource_owner, email: email)
     create_tokens(client, user, password, @scopes)
   end
+  def authorize(_) do
+    GrantTypeError.invalid_request(
+      "Request must include at least email, password and client_id parameters.")
+  end
 
-  def authorize(_), do: {:error,
-    %{invalid_request: "Request must include at least email, password and client_id parameters."},
-    :bad_request}
-
-  defp create_tokens(nil, _, _, _), do: {:error,
-    %{invalid_client: "Invalid client id."}, :unauthorized}
-  defp create_tokens(_, nil, _, _), do: {:error,
-    %{invalid_grant: "Identity not found."}, :bad_request}
+  defp create_tokens(nil, _, _, _),
+    do: GrantTypeError.invalid_client("Invalid client id.")
+  defp create_tokens(_, nil, _, _),
+    do: GrantTypeError.invalid_grant("Identity not found.")
   defp create_tokens(client, user, password, scopes) do
     {:ok, user}
     |> match_with_user_password(password)
@@ -73,15 +73,12 @@ defmodule Authable.GrantType.Password do
   defp validate_token_scope({:error, err, code}, _), do: {:error, err, code}
   defp validate_token_scope({:ok, user}, ""), do: {:ok, user}
   defp validate_token_scope({:ok, user}, required_scopes) do
-    scopes = @scopes |> Authable.Utils.String.comma_split
-    required_scopes = required_scopes |> Authable.Utils.String.comma_split
-    if Enum.find(required_scopes, fn(required_scope) ->
-        Enum.member?(scopes, required_scope) == false end) do
-      {:error, %{invalid_scope:
-        "Allowed scopes for the token are #{Enum.join(scopes, ", ")}."},
-        :bad_request}
-    else
+    scopes = Authable.Utils.String.comma_split(@scopes)
+    required_scopes = Authable.Utils.String.comma_split(required_scopes)
+    if Authable.Utils.List.subset?(scopes, required_scopes) do
       {:ok, user}
+    else
+      GrantTypeError.invalid_scope(scopes)
     end
   end
 
@@ -90,9 +87,7 @@ defmodule Authable.GrantType.Password do
     if CryptUtil.match_password(password, Map.get(user, :password, "")) do
       {:ok, user}
     else
-      {:error,
-        %{invalid_grant: "Identity, password combination is wrong."},
-        :bad_request}
+      GrantTypeError.invalid_grant("Identity, password combination is wrong.")
     end
   end
 

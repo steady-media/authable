@@ -4,6 +4,7 @@ defmodule Authable.GrantType.ClientCredentials do
   """
 
   import Authable.GrantType.Base
+  alias Authable.GrantType.Error, as: GrantTypeError
 
   @behaviour Authable.GrantType
   @repo Application.get_env(:authable, :repo)
@@ -38,41 +39,39 @@ defmodule Authable.GrantType.ClientCredentials do
     client = @repo.get_by(@client, id: client_id, secret: client_secret)
     create_tokens(client, scopes)
   end
-
   def authorize(%{"client_id" => client_id, "client_secret" => client_secret}) do
     client = @repo.get_by(@client, id: client_id, secret: client_secret)
     create_tokens(client, @scopes)
   end
+  def authorize(_) do
+    GrantTypeError.invalid_request(
+      "Request must include at least client_id, client_secret parameters.")
+  end
 
-  def authorize(_), do: {:error,
-    %{invalid_request: "Request must include at least client_id, client_secret parameters."},
-    :bad_request}
-
-  defp create_tokens(nil, _), do: {:error,
-    %{invalid_client: "Invalid client id or secret."}, :unauthorized}
+  defp create_tokens(nil, _),
+    do: GrantTypeError.invalid_client("Invalid client id or secret.")
   defp create_tokens(client, scopes) do
     {:ok, client}
     |> validate_token_scope(scopes)
     |> create_oauth2_tokens(scopes)
   end
 
-  defp create_oauth2_tokens({:error, err, code}, _), do: {:error, err, code}
-  defp create_oauth2_tokens({:ok, client}, scopes) do
-    create_oauth2_tokens(client.user_id, grant_type, client.id, scopes)
-  end
+  defp create_oauth2_tokens({:error, err, code}, _),
+    do: {:error, err, code}
+  defp create_oauth2_tokens({:ok, client}, scopes),
+    do: create_oauth2_tokens(client.user_id, grant_type, client.id, scopes)
 
-  defp validate_token_scope({:error, err, code}, _), do: {:error, err, code}
-  defp validate_token_scope({:ok, client}, ""), do: {:ok, client}
+  defp validate_token_scope({:error, err, code}, _),
+    do: {:error, err, code}
+  defp validate_token_scope({:ok, client}, ""),
+    do: {:ok, client}
   defp validate_token_scope({:ok, client}, required_scopes) do
-    scopes = @scopes |> Authable.Utils.String.comma_split
-    required_scopes = required_scopes |> Authable.Utils.String.comma_split
-    if Enum.find(required_scopes, fn(required_scope) ->
-        Enum.member?(scopes, required_scope) == false end) do
-      {:error, %{invalid_scope:
-        "Allowed scopes for the token are #{Enum.join(scopes, ", ")}."},
-        :bad_request}
-    else
+    scopes = Authable.Utils.String.comma_split(@scopes)
+    required_scopes = Authable.Utils.String.comma_split(required_scopes)
+    if Authable.Utils.List.subset?(scopes, required_scopes) do
       {:ok, client}
+    else
+      GrantTypeError.invalid_scope(scopes)
     end
   end
 

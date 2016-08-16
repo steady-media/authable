@@ -29,41 +29,10 @@ defmodule Authable.GrantType.Base do
   def create_oauth2_tokens(user_id, grant_type, client_id, scope, redirect_uri \\ nil) do
     scopes_check(scope)
 
-    token_params = %{
-      user_id: user_id,
-      details: %{
-        grant_type: grant_type,
-        client_id: client_id,
-        scope: scope,
-        redirect_uri: redirect_uri
-      }
-    }
-
-    token_params =
-      if @grant_types[:refresh_token] do
-        # create refresh_token
-        refresh_token_changeset = @token_store.refresh_token_changeset(
-          %@token_store{}, token_params
-        )
-        case @repo.insert(refresh_token_changeset) do
-          {:ok, refresh_token} ->
-            token_params |> Map.merge(%{details:
-              Map.put(token_params[:details],
-                :refresh_token, refresh_token.value)}
-            )
-          :error ->
-            token_params
-        end
-      else
-        token_params
-      end
-
-    access_token_changeset = @token_store.access_token_changeset(
-      %@token_store{}, token_params
-    )
-    case @repo.insert(access_token_changeset) do
-      {:ok, access_token} -> access_token
-    end
+    user_id
+    |> build_token_params(grant_type, client_id, scope, redirect_uri)
+    |> put_refresh_token?(@grant_types[:refresh_token])
+    |> create_access_token
   end
 
   @doc """
@@ -78,20 +47,57 @@ defmodule Authable.GrantType.Base do
         "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e"
       )
   """
-  def app_authorized?(user_id, client_id) do
-    !is_nil(@repo.get_by(@app, user_id: user_id, client_id: client_id))
-  end
+  def app_authorized?(user_id, client_id),
+    do: !is_nil(@repo.get_by(@app, user_id: user_id, client_id: client_id))
 
   defp scopes_check(scopes) do
     valid_scopes = Application.get_env(:authable, :scopes)
     desired_scopes = Authable.Utils.String.comma_split(scopes)
     Enum.each(desired_scopes, fn(scope) -> scope_check(valid_scopes, scope) end)
   end
-
   defp scope_check(valid_scopes, scope) do
     unless Enum.member?(valid_scopes, scope) do
       raise Authable.Error.SuspiciousActivity,
         message: "Scope: #{scope} is not supported!"
+    end
+  end
+
+  defp build_token_params(user_id, grant_type, client_id, scope, redirect_uri) do
+    %{
+      user_id: user_id,
+      details: %{
+        grant_type: grant_type,
+        client_id: client_id,
+        scope: scope,
+        redirect_uri: redirect_uri
+      }
+    }
+  end
+
+  defp put_refresh_token?(token_params, true),
+    do: put_refresh_token(token_params)
+  defp put_refresh_token?(token_params, _),
+    do: token_params
+  defp put_refresh_token(token_params) do
+    refresh_token_changeset = @token_store.refresh_token_changeset(
+      %@token_store{}, token_params
+    )
+    case @repo.insert(refresh_token_changeset) do
+      {:ok, refresh_token} ->
+        token_params |> Map.merge(%{details: Map.put(token_params[:details],
+          :refresh_token, refresh_token.value)}
+        )
+      :error ->
+        token_params
+    end
+  end
+
+  defp create_access_token(token_params) do
+    access_token_changeset = @token_store.access_token_changeset(
+      %@token_store{}, token_params
+    )
+    case @repo.insert(access_token_changeset) do
+      {:ok, access_token} -> access_token
     end
   end
 end
