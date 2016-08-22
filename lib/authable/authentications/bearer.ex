@@ -1,6 +1,6 @@
 defmodule Authable.Authentication.Bearer do
   @moduledoc """
-  Bearer authencation helper module, implements Authable.Authentication
+  Bearer authentication helper module, implements Authable.Authentication
   behaviour.
   """
 
