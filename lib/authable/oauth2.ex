@@ -1,6 +1,6 @@
 defmodule Authable.OAuth2 do
   @moduledoc """
-  OAut2 authorization strategy router
+  OAuth2 authorization strategy router
   """
 
   import Ecto.Query, only: [from: 2]
