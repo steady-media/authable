@@ -1,7 +1,7 @@
 defmodule Authable.AuthStrategy.Header do
   @moduledoc """
   Authable Strategy implements behaviour Authable.Strategy to check 'header'
-  based authencations to find resource owner.
+  based authentications to find resource owner.
   """
 
   import Plug.Conn, only: [get_req_header: 2]
