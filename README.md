@@ -118,7 +118,7 @@ Configure your application OAuth2 scopes on configuration. Then add `import Auth
 ```elixir
 defmodule SomeModule.AppController do
   use SomeModule.Web, :controller
-  plug Authable.Plug.Authenticate [scopes: ~w(read write)]
+  plug Authable.Plug.Authenticate, [scopes: ~w(read write)]
 
   def index(conn, _params) do
     # access to current user on successful authentication
@@ -130,7 +130,7 @@ end
 defmodule SomeModule.AppController do
   use SomeModule.Web, :controller
 
-  plug Authable.Plug.Authenticate [scopes: ~w(read write)] when action in [:create]
+  plug Authable.Plug.Authenticate, [scopes: ~w(read write)] when action in [:create]
 
   def index(conn, _params) do
     # anybody can call this action
@@ -174,7 +174,7 @@ Authable.OAuth2.authorize(%{
   "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
   "code" => "W_hb8JEDmeYChsNfOGCmbQ",
   "scope" => "read" # optional
-%})
+})
 
 # For client_credentials grant type
 Authable.OAuth2.authorize(%{
@@ -182,7 +182,7 @@ Authable.OAuth2.authorize(%{
   "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
   "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
   "scope" => "read" # optional
-%})
+})
 
 # For password grant type
 Authable.OAuth2.authorize(%{
@@ -191,7 +191,7 @@ Authable.OAuth2.authorize(%{
   "password" => "12345678",
   "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
   "scope" => "read" # optional
-%})
+})
 
 # For refresh_token grant type
 Authable.OAuth2.authorize(%{
@@ -200,7 +200,7 @@ Authable.OAuth2.authorize(%{
   "client_secret" => "Wi7Y_Q5LU4iIwJArgqXq2Q",
   "refresh_token" => "XJaVz3lCFC9IfifBriA-dw",
   "scope" => "read" # optional
-%})
+})
 
 # You can adjust token expiration durations from configuration.
 ```
@@ -216,7 +216,7 @@ Authable.OAuth2.authorize_app(user, %{
   "client_id" => "52024ca6-cf1d-4a9d-bfb6-9bc5023ad56e",
   "redirect_uri" => "http://localhost:4000/oauth2/callbacks",
   "scope" => "read,write"
-%})
+})
 ```
 
 ### Changing models
