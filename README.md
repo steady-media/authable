@@ -253,6 +253,10 @@ Authable is an extensible module, you can create your strategy and share as hex 
 
 - HMAC Auth will be added as a new external strategy
 
+## License
+
+MIT
+
 ## References
 
 https://tools.ietf.org/html/rfc6749
