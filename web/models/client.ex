@@ -24,9 +24,6 @@ defmodule Authable.Model.Client do
     timestamps
   end
 
-  @required_fields ~w(name redirect_uri user_id)
-  @optional_fields ~w(settings priv_settings)
-
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -35,7 +32,8 @@ defmodule Authable.Model.Client do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, [:name, :redirect_uri, :settings, :priv_settings, :user_id])
+    |> validate_required([:name, :redirect_uri, :user_id])
     |> validate_length(:name, min: 4, max: 32)
     |> validate_format(:name, ~r/\A([a-zA-Z]+)([0-9a-zA-Z]*)\z/i)
     |> unique_constraint(:name)

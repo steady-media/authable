@@ -37,15 +37,15 @@ defmodule Authable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:postgrex, "~> 0.11"},
-      {:ecto, "~> 2.0"},
-      {:comeonin, "~> 2.5"},
-      {:secure_random, "~> 0.3"},
-      {:plug, "~> 1.1"},
-      {:poison, "~> 2.2"},
+      {:postgrex, "~> 0.13"},
+      {:ecto, "~> 2.1.3"},
+      {:comeonin, "~> 3.0.1"},
+      {:secure_random, "~> 0.5"},
+      {:plug, "~> 1.3"},
+      {:poison, "~> 3.1"},
       {:ex_machina, "~> 1.0.2", only: :test},
-      {:credo, "~> 0.4.8", only: [:dev, :test]},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:credo, "~> 0.5.3", only: [:dev, :test]},
+      {:ex_doc, ">= 0.14.5", only: :dev}
     ]
   end
 
