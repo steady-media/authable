@@ -7,7 +7,8 @@ defmodule Authable.Utils.List do
   Check if a list superset of given list
   """
   def subset?(super_list, list) do
-    Enum.find(list, fn(item) -> Enum.member?(super_list, item) == false end)
+    list
+    |> Enum.find(fn(item) -> !Enum.member?(super_list, item) end)
     |> is_nil
   end
 end

@@ -21,9 +21,6 @@ defmodule Authable.Model.App do
     timestamps
   end
 
-  @required_fields ~w(scope client_id user_id)
-  @optional_fields ~w()
-
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -32,7 +29,8 @@ defmodule Authable.Model.App do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, [:scope, :client_id, :user_id])
+    |> validate_required([:scope, :client_id, :user_id])
     |> unique_constraint(:client_id, name: :apps_user_id_client_id_index)
   end
 end

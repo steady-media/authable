@@ -23,9 +23,6 @@ defmodule Authable.Model.Token do
     timestamps
   end
 
-  @required_fields ~w(user_id)
-  @optional_fields ~w(name expires_at details)
-
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -34,7 +31,8 @@ defmodule Authable.Model.Token do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, [:name, :expires_at, :details, :user_id])
+    |> validate_required([:user_id])
     |> put_token_value
     |> unique_constraint(:value, name: :tokens_value_name_index)
   end

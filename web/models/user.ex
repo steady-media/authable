@@ -25,9 +25,6 @@ defmodule Authable.Model.User do
     timestamps
   end
 
-  @required_fields ~w(email password)
-  @optional_fields ~w(settings priv_settings)
-
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -36,7 +33,8 @@ defmodule Authable.Model.User do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(email), @optional_fields)
+    |> cast(params, [:email, :password, :settings])
+    |> validate_required([:email, :password])
     |> validate_length(:email, min: 6, max: 255)
     |> validate_format(:email,
          ~r/\A([\w+\-]\.?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
@@ -44,14 +42,15 @@ defmodule Authable.Model.User do
 
   def settings_changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(settings), [])
+    |> cast(params, [:settings])
+    |> validate_required([:settings])
   end
 
   def registration_changeset(model, params \\ :empty) do
     model
     |> changeset(params)
     |> unique_constraint(:email)
-    |> cast(params, ~w(password), [])
+    |> cast(params, [:password])
     |> validate_length(:password, min: 8, max: 32)
     |> put_password_hash
     |> put_unconfirmed_flag
@@ -59,7 +58,8 @@ defmodule Authable.Model.User do
 
   def password_changeset(model, params) do
     model
-    |> cast(params, ~w(password), [])
+    |> cast(params, [:password])
+    |> validate_required([:password])
     |> validate_length(:password, min: 8, max: 32)
     |> put_password_hash
   end
