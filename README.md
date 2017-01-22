@@ -16,15 +16,9 @@ The package can be installed as:
     end
     ```
 
-  2. Ensure authable is started before your application:
+  2. Add authable configurations to your `config/config.exs` file:
 
-    ```elixir
-    def application do
-      [applications: [:authable]]
-    end
-    ```
-
-  3. Add authable configurations to your `config/config.exs` file:
+  *Important:* You should update `Authable.Repo` with your own repo!
 
     ```elixir
     config :authable,
@@ -71,7 +65,9 @@ The package can be installed as:
 
   If you want to add a new grant type then add your own module with `authorize(params)` function and return a `Authable.Model.Token` struct.
 
-  4. Add database configurations for the `Authable.Repo` on env config files:
+  3. Add database configurations for the `Authable.Repo` on env config files:
+
+  *Important:* You should update `Authable.Repo` with your own repo!
 
     ```elixir
     config :authable, Authable.Repo,
@@ -83,13 +79,15 @@ The package can be installed as:
       pool_size: 10
     ```
 
-  5. Run migrations for Authable.Repo (Note: all id fields are UUID type):
+  4. Run migrations for Authable.Repo (Note: all id fields are UUID type):
+
+  *Important:* You should update `Authable.Repo` with your own repo!
 
     ```elixir
     mix ecto.migrate -r Authable.Repo
     ```
 
-  6. You are ready to go!
+  5. You are ready to go!
 
 ## Usage
 
