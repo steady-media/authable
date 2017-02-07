@@ -1,4 +1,5 @@
 {:ok, _} = Application.ensure_all_started(:ex_machina)
+{:ok, _} = Authable.Repo.start_link
 ExUnit.start
 
 #Mix.Task.run "ecto.drop", ~w(-r Authable.Repo)

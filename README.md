@@ -6,13 +6,19 @@ OAuth2 Provider implementation modules and helpers using `plug`, `ecto` and `pos
 
 The package can be installed as:
 
-  1. Add authable to your list of dependencies in `mix.exs`:
+  1. Add authable to the dependencies and applications lists in `mix.exs`:
 
   Only for ecto versions > 2.0
 
     ```elixir
     def deps do
       [{:authable, "~> 0.7.0"}]
+    end
+    ```
+
+    ```elixir
+    def application do
+      [applications: [:authable]]
     end
     ```
 

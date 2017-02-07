@@ -20,7 +20,6 @@ defmodule Authable.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      mod: {Authable, []},
       applications: [:logger, :comeonin, :ecto, :postgrex,
         :secure_random]
     ]
