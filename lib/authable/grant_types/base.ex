@@ -74,10 +74,10 @@ defmodule Authable.GrantType.Base do
     }
   end
 
-  defp put_refresh_token?(token_params, true),
-    do: put_refresh_token(token_params)
-  defp put_refresh_token?(token_params, _),
+  defp put_refresh_token?(token_params, nil),
     do: token_params
+  defp put_refresh_token?(token_params, _),
+    do: put_refresh_token(token_params)
   defp put_refresh_token(token_params) do
     refresh_token_changeset = @token_store.refresh_token_changeset(
       %@token_store{}, token_params
