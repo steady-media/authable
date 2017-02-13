@@ -18,7 +18,7 @@ defmodule Authable.Authentication.Token do
 
   It matches resource owner with given token name and value.
   If any resource owner matched given credentials,
-  it returns `Authable.Model.User` struct, otherwise
+  it returns `Authable.Model.User` struct and `Authable.Model.Token` struct, otherwise
   `{:error, Map, :http_status_code}`.
 
   ## Examples
@@ -46,7 +46,8 @@ defmodule Authable.Authentication.Token do
       scopes = Authable.Utils.String.comma_split(token.details["scope"])
       if Authable.Utils.List.subset?(scopes, required_scopes) do
         resource_owner_check(
-          @repo.get(@resource_owner, token.user_id)
+          @repo.get(@resource_owner, token.user_id),
+          token
         )
       else
         AuthenticationError.insufficient_scope(required_scopes)
@@ -54,8 +55,8 @@ defmodule Authable.Authentication.Token do
     end
   end
 
-  defp resource_owner_check(nil),
+  defp resource_owner_check(nil, _token),
     do: AuthenticationError.invalid_token("User not found.")
-  defp resource_owner_check(resource_owner),
-    do: {:ok, resource_owner}
+  defp resource_owner_check(resource_owner, token),
+    do: {:ok, resource_owner, token}
 end

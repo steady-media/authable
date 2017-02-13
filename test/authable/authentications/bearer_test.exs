@@ -9,25 +9,28 @@ defmodule Authable.Authentication.BearerTest do
 
   setup do
     user = insert(:user)
-    insert(:access_token, %{value: @access_token_value, user: user})
-    :ok
+    token = insert(:access_token, %{value: @access_token_value, user: user})
+    {:ok, user: user, token: token}
   end
 
-  test "authorize with bearer authentication" do
-    {:ok, authorized_user} = BearerAuthentication.authenticate(
+  test "authorize with bearer authentication", %{user: user, token: token} do
+    {:ok, authorized_user, current_token} = BearerAuthentication.authenticate(
       @access_token_value, [])
-    refute is_nil(authorized_user)
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 
-  test "authorize with bearer authentication using Bearer prefix" do
-    {:ok, authorized_user} = BearerAuthentication.authenticate(
+  test "authorize with bearer authentication using Bearer prefix", %{user: user, token: token} do
+    {:ok, authorized_user, current_token} = BearerAuthentication.authenticate(
       "Bearer #{@access_token_value}", [])
-    refute is_nil(authorized_user)
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 
-  test "authorize with bearer authentication from map parameters" do
-    {:ok, authorized_user} = BearerAuthentication.authenticate(
+  test "authorize with bearer authentication from map parameters", %{user: user, token: token} do
+    {:ok, authorized_user, current_token} = BearerAuthentication.authenticate(
       %{"access_token" => @access_token_value}, [])
-    refute is_nil(authorized_user)
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 end

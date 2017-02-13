@@ -17,20 +17,24 @@ defmodule Authable.AuthStrategy.HeaderTest do
     assert {:ok, user} == HeaderAuthStrategy.authenticate(conn, ~w(read))
   end
 
-  test "returns user model when authenticates with Bearer Authentication using valid data", %{conn: conn} do
+  test "returns user model and token when authenticates with Bearer Authentication using valid data", %{conn: conn} do
     user = insert(:user)
     client = insert(:client, user: user)
     token = insert(:access_token, user: user, details: %{client_id: client.id, scope: "read"})
     conn = conn |> put_req_header("authorization", "Bearer #{token.value}")
-    assert {:ok, user} == HeaderAuthStrategy.authenticate(conn, ~w(read))
+    {:ok, authorized_user, current_token} = HeaderAuthStrategy.authenticate(conn, ~w(read))
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 
-  test "returns user model when authenticates with X-API-TOKEN using valid data", %{conn: conn} do
+  test "returns user model and token when authenticates with X-API-TOKEN using valid data", %{conn: conn} do
     user = insert(:user)
     client = insert(:client, user: user)
     token = insert(:access_token, user: user, details: %{client_id: client.id, scope: "read"})
     conn = conn |> put_req_header("x-api-token", "#{token.value}")
-    assert {:ok, user} == HeaderAuthStrategy.authenticate(conn, ~w(read))
+    {:ok, authorized_user, current_token} = HeaderAuthStrategy.authenticate(conn, ~w(read))
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 
   # applies for Basic, Berarer and any others...

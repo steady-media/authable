@@ -35,7 +35,7 @@ defmodule Authable.Authentication.Bearer do
   def authenticate(access_token, required_scopes) do
     case TokenAuthentication.authenticate(
       {"access_token", access_token}, required_scopes) do
-        {:ok, user} -> {:ok, user}
+        {:ok, user, token} -> {:ok, user, token}
         {:error, errors, status} -> {:error,
           Map.put(errors, :headers, error_headers(errors)), status}
     end

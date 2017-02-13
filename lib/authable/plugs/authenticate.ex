@@ -73,6 +73,9 @@ defmodule Authable.Plug.Authenticate do
     |> @renderer.render(http_status_code, %{errors: errors})
     |> halt
   end
-  defp response_conn_with(conn, {:ok, current_user}), do: assign(conn,
-    :current_user, current_user)
+  defp response_conn_with(conn, {:ok, current_user, current_token}) do
+    conn
+    |> assign(:current_user, current_user)
+    |> assign(:current_token, current_token)
+  end
 end

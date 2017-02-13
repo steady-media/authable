@@ -28,11 +28,13 @@ defmodule Authable.AuthStrategy.SessionTest do
     |> fetch_session
   end
 
-  test "returns user model when authenticates with session using valid data", %{conn: conn} do
+  test "returns user model and token when authenticates with session using valid data", %{conn: conn} do
     user = insert(:user)
     token = insert(:session_token, user_id: user.id)
     conn = conn |> sign_conn |> put_session(:session_token, token.value)
-    assert {:ok, user} == SessionAuthStrategy.authenticate(conn, [])
+    {:ok, authorized_user, current_token} = SessionAuthStrategy.authenticate(conn, [])
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 
   test "returns error when authenticates with session using invalid data", %{conn: conn} do

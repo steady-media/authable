@@ -29,7 +29,7 @@ defmodule Authable.Authentication.Session do
   def authenticate(session_token, required_scopes) do
     case TokenAuthentication.authenticate(
       {"session_token", session_token}, required_scopes) do
-        {:ok, user} -> {:ok, user}
+        {:ok, user, token} -> {:ok, user, token}
         {:error, errors, status} -> {:error,
           Map.put(errors, :headers, error_headers), status}
     end

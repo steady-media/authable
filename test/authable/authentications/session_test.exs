@@ -8,13 +8,15 @@ defmodule Authable.Authentication.SessionTest do
   @session_token_value "session_token_1234"
 
   setup do
-    insert(:session_token, %{value: @session_token_value, user: insert(:user)})
-    :ok
+    user = insert(:user)
+    token = insert(:session_token, %{value: @session_token_value, user: user})
+    {:ok, user: user, token: token}
   end
 
-  test "authorize with session auth token" do
-    {:ok, authorized_user} = SessionAuthentication.authenticate(
+  test "authorize with session auth token", %{user: user, token: token} do
+    {:ok, authorized_user, current_token} = SessionAuthentication.authenticate(
       @session_token_value, [])
-    refute is_nil(authorized_user)
+    assert authorized_user == user
+    assert current_token.id == token.id
   end
 end
