@@ -8,10 +8,10 @@ defmodule Authable.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     aliases: aliases,
-     description: description,
-     package: package,
-     deps: deps,
+     aliases: aliases(),
+     description: description(),
+     package: package(),
+     deps: deps(),
      docs: [extras: ["README.md"]]]
   end
 
