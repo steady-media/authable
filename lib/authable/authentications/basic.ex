@@ -45,7 +45,7 @@ defmodule Authable.Authentication.Basic do
         [email, password] = String.split(credentials, ":")
         authenticate_with_credentials(email, password)
       :error -> {:error, %{invalid_request: "Invalid credentials encoding.",
-        headers: error_headers},
+        headers: error_headers()},
         :bad_request}
     end
   end
@@ -53,13 +53,13 @@ defmodule Authable.Authentication.Basic do
     case @repo.get_by(@resource_owner, email: email) do
       nil ->
         {:error, %{invalid_credentials: "Identity not found.", headers:
-          error_headers}, :unauthorized}
+          error_headers()}, :unauthorized}
       user ->
         case match_with_user_password(password, user) do
           true -> {:ok, user}
           false -> {:error, %{invalid_credentials:
             "Identity, password combination is wrong.",
-            headers: error_headers}, :unauthorized}
+            headers: error_headers()}, :unauthorized}
         end
     end
   end

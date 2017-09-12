@@ -67,7 +67,7 @@ defmodule Authable.GrantType.Password do
   defp create_oauth2_tokens({:error, err, code}, _, _), do: {:error, err, code}
   defp create_oauth2_tokens({:ok, user}, client, scopes) do
     create_oauth2_tokens(
-      user.id, grant_type, client.id, scopes, client.redirect_uri)
+      user.id, grant_type(), client.id, scopes, client.redirect_uri)
   end
 
   defp validate_token_scope({:error, err, code}, _), do: {:error, err, code}

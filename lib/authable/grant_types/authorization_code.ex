@@ -8,10 +8,8 @@ defmodule Authable.GrantType.AuthorizationCode do
 
   @behaviour Authable.GrantType
   @repo Application.get_env(:authable, :repo)
-  @resource_owner Application.get_env(:authable, :resource_owner)
   @token_store Application.get_env(:authable, :token_store)
   @client Application.get_env(:authable, :client)
-  @app Application.get_env(:authable, :app)
 
   @doc """
   Authorize client for 'resource owner' using client credentials and
@@ -58,7 +56,7 @@ defmodule Authable.GrantType.AuthorizationCode do
   defp do_authorize(nil, _, _, _),
     do: GrantTypeError.invalid_client("Invalid client id or secret.")
   defp do_authorize(client, code, redirect_uri, scopes) do
-    token = @repo.get_by(@token_store, value: code, name: grant_type)
+    token = @repo.get_by(@token_store, value: code, name: grant_type())
     create_tokens(token, client, redirect_uri, scopes)
   end
 
@@ -77,7 +75,7 @@ defmodule Authable.GrantType.AuthorizationCode do
   defp create_oauth2_tokens({:error, err, code}), do: {:error, err, code}
   defp create_oauth2_tokens({:ok, token}) do
     create_oauth2_tokens(
-      token.user_id, grant_type, token.details["client_id"],
+      token.user_id, grant_type(), token.details["client_id"],
       token.details["scope"], token.details["redirect_uri"])
   end
 
@@ -131,8 +129,6 @@ defmodule Authable.GrantType.AuthorizationCode do
     end
   end
 
-  defp validate_client_match({:error, err, code}),
-    do: {:error, err, code}
   defp validate_client_match({:ok, token}, client) do
     if token.details["client_id"] != client.id do
       GrantTypeError.invalid_grant("Token not found or expired.")

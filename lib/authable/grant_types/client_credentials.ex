@@ -59,7 +59,7 @@ defmodule Authable.GrantType.ClientCredentials do
   defp create_oauth2_tokens({:error, err, code}, _),
     do: {:error, err, code}
   defp create_oauth2_tokens({:ok, client}, scopes),
-    do: create_oauth2_tokens(client.user_id, grant_type, client.id, scopes)
+    do: create_oauth2_tokens(client.user_id, grant_type(), client.id, scopes)
 
   defp validate_token_scope({:error, err, code}, _),
     do: {:error, err, code}

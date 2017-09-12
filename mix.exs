@@ -20,8 +20,7 @@ defmodule Authable.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :comeonin, :ecto, :postgrex,
-        :secure_random]
+      extra_applications: [:logger]
     ]
   end
 
@@ -38,7 +37,8 @@ defmodule Authable.Mixfile do
     [
       {:postgrex, "~> 0.13"},
       {:ecto, "~> 2.1"},
-      {:comeonin, "~> 3.0"},
+      {:bcrypt_elixir, "~> 1.0"},
+      {:comeonin, "~> 4.0"},
       {:secure_random, "~> 0.5"},
       {:plug, "~> 1.0 or ~> 1.1 or ~> 1.2 or ~> 1.3"},
       {:poison, "~> 2.0 or ~> 2.1 or ~> 2.2 or ~> 3.0 or ~> 3.1"},
