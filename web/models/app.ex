@@ -18,7 +18,7 @@ defmodule Authable.Model.App do
     belongs_to :client, @client
     belongs_to :user, @resource_owner
 
-    timestamps
+    timestamps()
   end
 
   @doc """

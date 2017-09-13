@@ -22,7 +22,7 @@ defmodule Authable.Model.User do
     has_many :tokens, @token_store
     has_many :apps, @app
 
-    timestamps
+    timestamps()
   end
 
   @doc """

@@ -8,10 +8,8 @@ defmodule Authable.GrantType.RefreshToken do
 
   @behaviour Authable.GrantType
   @repo Application.get_env(:authable, :repo)
-  @resource_owner Application.get_env(:authable, :resource_owner)
   @token_store Application.get_env(:authable, :token_store)
   @client Application.get_env(:authable, :client)
-  @app Application.get_env(:authable, :app)
 
   @doc """
   Authorize client for 'resouce owner' using client credentials and
@@ -72,7 +70,7 @@ defmodule Authable.GrantType.RefreshToken do
     do: {:error, err, code}
   defp create_oauth2_tokens({:ok, token}, required_scopes) do
     create_oauth2_tokens(
-      token.user_id, grant_type, token.details["client_id"],
+      token.user_id, grant_type(), token.details["client_id"],
       required_scopes, token.details["redirect_uri"])
   end
 
@@ -118,8 +116,6 @@ defmodule Authable.GrantType.RefreshToken do
     end
   end
 
-  defp validate_client_match({:error, err, code}),
-    do: {:error, err, code}
   defp validate_client_match({:ok, _}, nil),
     do: GrantTypeError.invalid_client("Client not found.")
   defp validate_client_match({:ok, token}, client) do

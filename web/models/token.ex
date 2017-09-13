@@ -20,7 +20,7 @@ defmodule Authable.Model.Token do
     field :details, :map
     belongs_to :user, @resource_owner
 
-    timestamps
+    timestamps()
   end
 
   @doc """
