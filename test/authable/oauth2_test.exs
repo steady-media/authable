@@ -5,14 +5,13 @@ defmodule Authable.OAuth2Test do
   import Authable.Factory
   import Ecto.Query, only: [where: 2]
   alias Authable.OAuth2
-  alias Authable.Error.SuspiciousActivity, as: SuspiciousActivityError
 
   @redirect_uri "https://xyz.com/rd"
   @scopes "read"
 
   test "raise when strategy not exist" do
     params = %{"grant_type" => "urn"}
-    assert_raise SuspiciousActivityError, fn -> OAuth2.authorize(params) end
+    assert_raise ArgumentError, fn -> OAuth2.authorize(params) end
   end
 
   test "resource_owner authorize app for a client" do
