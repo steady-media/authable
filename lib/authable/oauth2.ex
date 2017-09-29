@@ -58,7 +58,7 @@ defmodule Authable.OAuth2 do
   """
   def authorize(params) do
     strategy_check(params["grant_type"])
-    @grant_types[String.to_atom(params["grant_type"])].authorize(params)
+    @grant_types[String.to_existing_atom(params["grant_type"])].authorize(params)
   end
 
   @doc """
@@ -130,7 +130,7 @@ defmodule Authable.OAuth2 do
   end
 
   defp strategy_check(grant_type) do
-    unless Map.has_key?(@grant_types, String.to_atom(grant_type)) do
+    unless Map.has_key?(@grant_types, String.to_existing_atom(grant_type)) do
       raise Authable.Error.SuspiciousActivity,
         message: "Strategy for '#{grant_type}' is not enabled!"
     end
