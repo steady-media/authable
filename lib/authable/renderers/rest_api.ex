@@ -11,7 +11,7 @@ defmodule Authable.Renderer.RestApi do
   def render(conn, status, map) do
     conn
     |> put_resp_content_type("application/json", "utf-8")
-    |> resp(status, Poison.encode!(merge_error_keys(map)))
+    |> resp(status, Jason.encode!(merge_error_keys(map)))
   end
 
   defp merge_error_keys(%{errors: errors}) do
