@@ -37,7 +37,7 @@ defmodule Authable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:postgrex, "~> 0.13"},
+      {:postgrex, "~> 0.14"},
       {:ecto, "~> 3.0"},
       {:ecto_sql, "~> 3.0", optional: true},
       {:jason, "~> 1.1"},
