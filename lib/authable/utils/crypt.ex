@@ -3,8 +3,6 @@ defmodule Authable.Utils.Crypt do
   Crypt utilities
   """
 
-  alias Comeonin.Bcrypt
-
   @doc """
   Compares string with Bcrypted version of the string.
 
@@ -17,7 +15,7 @@ defmodule Authable.Utils.Crypt do
       )
   """
   def match_password(password, crypted_password) do
-    Bcrypt.checkpw(password, crypted_password)
+    Bcrypt.verify_pass(password, crypted_password)
   end
 
   @doc """
@@ -31,7 +29,7 @@ defmodule Authable.Utils.Crypt do
       # "$2b$12$wHkoEnYQ03mWH1CsByPB4ek4xu7QXIFYl5gAC6b8zYs3aj/9DNv3u"
   """
   def salt_password(password) do
-    Bcrypt.hashpwsalt(password)
+    Bcrypt.hash_pwd_salt(password)
   end
 
   @doc """
