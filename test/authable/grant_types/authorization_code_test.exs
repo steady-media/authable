@@ -33,4 +33,9 @@ defmodule Authable.GrantType.AuthorizationCodeTest do
     {:error, _, http_status} = AuthorizationCodeGrantType.authorize(params)
     assert http_status == :unauthorized
   end
+
+  test "gracefully handles missing code", %{params: params} do
+    {:error, _, http_status} = AuthorizationCodeGrantType.authorize(%{params | "code" => nil})
+    assert http_status == :unauthorized
+  end
 end

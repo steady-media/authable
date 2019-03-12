@@ -55,6 +55,8 @@ defmodule Authable.GrantType.AuthorizationCode do
 
   defp do_authorize(nil, _, _, _),
     do: GrantTypeError.invalid_client("Invalid client id or secret.")
+  defp do_authorize(_, nil, _, _),
+    do: GrantTypeError.invalid_client("Invalid code.")
   defp do_authorize(client, code, redirect_uri, scopes) do
     token = @repo.get_by(@token_store, value: code, name: grant_type())
     create_tokens(token, client, redirect_uri, scopes)
