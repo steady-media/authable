@@ -10,7 +10,10 @@ defmodule Authable.Plug.Authenticate do
   @renderer Application.get_env(:authable, :renderer)
 
   def init(opts) do
-    Keyword.get opts, :scopes, ""
+    [
+      scopes: Keyword.get(opts, :scopes, ""),
+      halt: Keyword.get(opts, :halt, true)
+    ]
   end
 
   @doc """
@@ -19,10 +22,12 @@ defmodule Authable.Plug.Authenticate do
   If it fails, then it halts connection and returns :bad_request, :unauthorized
   or :forbidden status codes with error json.
 
-  There is one option:
+  However, if it fails, but the option `:halt` is set to false, it does nothing.
 
-    * scopes - the function used to authorize the resource access
-    * the default is ""
+  There are two options:
+
+    * scopes - the function used to authorize the resource access (default: "")
+    * halt - whether to halt the connection in case of authorization failure (default: true)
 
   ## Examples
 
@@ -54,18 +59,18 @@ defmodule Authable.Plug.Authenticate do
         end
       end
   """
-  def call(conn, scopes) do
+  def call(conn, [scopes: scopes, halt: halt]) do
     response_conn_with(conn, Authable.Helper.authorize_for_resource(conn,
-      scopes))
+      scopes), halt)
   end
 
-  defp response_conn_with(conn, nil) do
+  defp response_conn_with(conn, nil, true) do
     conn
     |> put_resp_header("www-authenticate", "Bearer realm=\"authable\"")
     |> @renderer.render(:forbidden, %{errors: %{details: "Resource access requires authentication!"}})
     |> halt
   end
-  defp response_conn_with(conn, {:error, errors, http_status_code}) do
+  defp response_conn_with(conn, {:error, errors, http_status_code}, true) do
     [%{"www-authenticate" => header_val}] = errors[:headers]
     errors = %{errors: Map.delete(errors, :headers)}
     conn
@@ -73,9 +78,12 @@ defmodule Authable.Plug.Authenticate do
     |> @renderer.render(http_status_code, %{errors: errors})
     |> halt
   end
-  defp response_conn_with(conn, {:ok, current_user, current_token}) do
+  defp response_conn_with(conn, {:ok, current_user, current_token}, _) do
     conn
     |> assign(:current_user, current_user)
     |> assign(:current_token, current_token)
+  end
+  defp response_conn_with(conn, _, false) do
+    conn
   end
 end
