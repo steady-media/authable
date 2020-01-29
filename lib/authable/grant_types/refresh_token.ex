@@ -77,8 +77,18 @@ defmodule Authable.GrantType.RefreshToken do
   defp delete_token({:error, err, code}),
     do: {:error, err, code}
   defp delete_token({:ok, token}) do
-    @repo.delete!(token)
-    {:ok, token}
+    case @repo.delete(token, stale_error_field: :id) do
+      {:ok, _} ->
+        {:ok, token}
+
+      {:error, changeset} ->
+        if changeset.errors[:id] do
+          # stale error -> token was already deleted
+          {:ok, token}
+        else
+          raise "could not delete token during refresh"
+        end
+    end
   end
 
   defp validate_token_scope({:error, err, code}, _),
